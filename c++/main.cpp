@@ -1,47 +1,83 @@
-#include <iostream>
+#pragma once
+#include <chrono>
+#include "printf.h"
+#include "string"
+#include "map"
 #include "Game.h"
 
 using namespace std;
 
-int main()
+class Timer
 {
-  Connect4 *game = new Connect4();
+private:
+  std::chrono::time_point<std::chrono::steady_clock> m_StartTime;
 
-  int move = -1;
-
-  while (!game->is_terminal_state())
+public:
+  void Start()
   {
-    // cout << "Choose column from 0-6" << endl;
-    // cin >> move;
-    try
-    {
-      vector<int> moves = game->get_valid_columns();
+    m_StartTime = std::chrono::high_resolution_clock::now();
+  }
+  float GetDuration()
+  {
+    std::chrono::duration<float> duration = std::chrono::high_resolution_clock::now() - m_StartTime;
+    return duration.count();
+  }
+};
 
-      int turn = game->get_to_move();
+array<int, 2> mini_max(Connect4, int, int, int, bool);
 
-      cout << "Player " << turn << endl;
+string players_arr[] = {"John", "Dave"};
 
-      // cout << "Choose a column to drop in: " << endl;
-      // for (vector<int>::const_iterator i = moves.begin(); i != moves.end(); ++i)
-      // {
-      //   cout << *i << ' ';
-      // }
-      // cout << endl;
+string play_a_game(string player_1, string player_2)
+{
+  Connect4 game = Connect4();
 
-      // cin >> move;
-      move = turn == 0 ? 0 : 1;
-
-      game->drop_piece_in_column(move);
-      game->print_board();
-    }
-    catch (const char *msg)
-    {
-      cout << msg << endl;
-    }
-    int winner = game->get_to_move_opponent();
-    cout << "Player " << winner << " wins" << endl;
+  while (!game.is_terminal_state())
+  {
+    int column = mini_max(game, 5, numeric_limits<int>::min(), numeric_limits<int>::max(), true)[0];
+    game.drop_piece_in_column(column);
   }
 
-  game->~Connect4();
+  game.print_board();
+
+  if (game.winning_move())
+  {
+    return game.get_current_opponent_piece() == game.PLAYER_1 ? player_1 : player_2;
+  }
+  else
+  {
+    return "Draw";
+  }
+}
+
+void play_a_match(map<string, int> *scores)
+{
+  string first = play_a_game(players_arr[0], players_arr[1]);
+  string second = play_a_game(players_arr[1], players_arr[0]);
+
+  (*scores)[first] += 1;
+  (*scores)[second] += 1;
+}
+
+int main()
+{
+  map<string, int> score;
+
+  score[players_arr[0]] = 0;
+  score[players_arr[1]] = 0;
+  score["Draw"] = 0;
+  Connect4 game = Connect4();
+
+  Timer timer = Timer();
+  timer.Start();
+
+  for (int i = 0; i < 1; i++)
+  {
+    play_a_match(&score);
+  }
+
+  printf("Time: %f\n", timer.GetDuration());
+  printf("%s: %d, %s: %d, Draws: %d\n", players_arr[0].c_str(), score[players_arr[0]], players_arr[1].c_str(), score[players_arr[1]], score["Draws"]);
+
   return 0;
 }

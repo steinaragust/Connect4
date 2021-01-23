@@ -1,9 +1,11 @@
 using namespace std;
-#include <iostream>
 
 #ifndef CONNECT4_H
 #define CONNECT4_H
 #include <vector>
+#include <array>
+#include "printf.h"
+#include "string"
 
 class Connect4
 {
@@ -11,11 +13,11 @@ public:
   // Constructor/Deconstructoor
   Connect4();
   ~Connect4();
-  Connect4(Connect4 &copy);
+  Connect4(const Connect4 &copy);
 
   // Get methods
   int get_move_no();
-  int **get_board();
+  array<array<int, 7>, 6> get_board();
   int get_to_move();
   int get_to_move_opponent();
   int get_current_piece();
@@ -31,11 +33,6 @@ public:
   bool is_terminal_state();
   void print_board();
 
-  // Class variables
-  int **board;
-  int *turn;
-  int *no_moves;
-
   // Class constants
   const int EMPTY = 1;
   const int PLAYER_1 = 0;
@@ -46,6 +43,11 @@ public:
   const int ROWS = 6;
   const int COLUMNS = 7;
   const int WINDOW = 4;
+
+  // Class variables
+  array<array<int, 7>, 6> board;
+  int turn;
+  int no_moves;
 
   // Call python functions
   function<void(int **)> cpp_f;
@@ -66,17 +68,19 @@ public:
     }
 
     cpp_f(arr);
-    cout << string(COLUMNS + 2, '-') << endl;
+    printf("%s", string(COLUMNS + 2, '-').c_str());
+    printf("\n");
     for (int i = ROWS - 1; i > -1; i--)
     {
-      cout << "[";
+      printf("[");
       for (int j = 0; j < COLUMNS; j++)
       {
-        cout << arr[i][j];
+        printf("%d", arr[i][j]);
       }
-      cout << "]" << endl;
+      printf("]\n");
     }
-    cout << string(COLUMNS + 2, '-') << endl;
+    printf("%s", string(COLUMNS + 2, '-').c_str());
+    printf("\n");
   }
 
 private:

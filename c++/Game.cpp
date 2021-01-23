@@ -1,43 +1,19 @@
 #include "Game.h"
-#include <iostream>
 
 Connect4::Connect4()
 {
-  turn = new int;
-  *turn = PLAYER_1;
-  create_board();
-  no_moves = new int;
-  *no_moves = 0;
+  reset();
 }
 
 Connect4::~Connect4()
 {
-  delete turn;
-  delete no_moves;
-  for (int i = 0; i < ROWS; i++)
-  {
-    delete[] board[i];
-  }
-  delete[] board;
-  cout << "Deconstructor called" << endl;
 }
 
-Connect4::Connect4(Connect4 &copy)
+Connect4::Connect4(const Connect4 &copy)
 {
-  turn = new int;
-  *turn = copy.get_to_move();
-  board = new int *[ROWS];
-  int **copy_board = copy.get_board();
-  for (int i = 0; i < ROWS; i++)
-  {
-    board[i] = new int[COLUMNS];
-    for (int j = 0; j < COLUMNS; j++)
-    {
-      board[i][j] = copy_board[i][j];
-    }
-  }
-  no_moves = new int;
-  *no_moves = copy.get_move_no();
+  turn = copy.turn;
+  board = copy.board;
+  no_moves = copy.no_moves;
 }
 
 void Connect4::reset()
@@ -49,36 +25,23 @@ void Connect4::reset()
       board[i][j] = 0;
     }
   }
-  *no_moves = 0;
-  *turn = PLAYER_1;
-}
-
-void Connect4::create_board()
-{
-  board = new int *[ROWS];
-  for (int i = 0; i < ROWS; i++)
-  {
-    board[i] = new int[COLUMNS];
-    for (int j = 0; j < COLUMNS; j++)
-    {
-      board[i][j] = 0;
-    }
-  }
+  no_moves = 0;
+  turn = PLAYER_1;
 }
 
 int Connect4::get_move_no()
 {
-  return *no_moves;
+  return no_moves;
 }
 
-int **Connect4::get_board()
+array<array<int, 7>, 6> Connect4::get_board()
 {
   return board;
 }
 
 int Connect4::get_to_move()
 {
-  return *turn;
+  return turn;
 }
 
 int Connect4::get_to_move_opponent()
@@ -88,12 +51,12 @@ int Connect4::get_to_move_opponent()
 
 int Connect4::get_current_piece()
 {
-  return PIECE_PLAYER[*turn];
+  return PIECE_PLAYER[turn];
 }
 
 int Connect4::get_current_opponent_piece()
 {
-  return PIECE_PLAYER[(*turn) == PLAYER_1 ? PLAYER_2 : PLAYER_1];
+  return PIECE_PLAYER[turn == PLAYER_1 ? PLAYER_2 : PLAYER_1];
 }
 
 int Connect4::get_next_open_row(int column)
@@ -136,13 +99,20 @@ void Connect4::drop_piece_in_column(int column)
   }
   int piece = get_current_piece();
   set_piece(row, column, piece);
-  *no_moves += 1;
+  no_moves += 1;
+}
+
+void Connect4::retract_piece_in_column(int column)
+{
+  int row = get_next_open_row(column);
+  set_piece((row == -1 ? ROWS : row) - 1, column, EMPTY);
+  no_moves -= 1;
 }
 
 void Connect4::set_piece(int row, int column, int piece)
 {
   board[row][column] = piece;
-  *turn = get_to_move() == PLAYER_1 ? PLAYER_2 : PLAYER_1;
+  turn = get_to_move() == PLAYER_1 ? PLAYER_2 : PLAYER_1;
 }
 
 bool Connect4::is_valid_column(int column)
@@ -212,17 +182,19 @@ bool Connect4::winning_move()
 
 void Connect4::print_board()
 {
-  cout << string(COLUMNS + 2, '-') << endl;
+  printf("%s", string(COLUMNS + 2, '-').c_str());
+  printf("\n");
   for (int i = ROWS - 1; i > -1; i--)
   {
-    cout << "[";
+    printf("[");
     for (int j = 0; j < COLUMNS; j++)
     {
-      cout << board[i][j];
+      printf("%d", board[i][j]);
     }
-    cout << "]" << endl;
+    printf("]\n");
   }
-  cout << string(COLUMNS + 2, '-') << endl;
+  printf("%s", string(COLUMNS + 2, '-').c_str());
+  printf("\n");
 }
 
 bool Connect4::is_terminal_state()

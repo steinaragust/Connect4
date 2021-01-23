@@ -18,6 +18,7 @@ def play_a_game(player_1, player_2):
 
     if game.winning_move():
         return player_1 if game.get_opponent_piece() == 0 else player_2
+    game.print_board()
     return 'Draw'
 
 

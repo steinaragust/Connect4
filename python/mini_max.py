@@ -1,6 +1,5 @@
 import math
 import random
-import copy
 
 
 def evaluate_window(window, game):
@@ -77,9 +76,9 @@ def minimax(game, depth, alpha, beta, maximizingPlayer):
         value = -math.inf
         column = random.choice(valid_locations)
         for col in valid_locations:
-            game_c = copy.deepcopy(game)
-            game_c.drop_piece_in_column(col)
-            new_score = minimax(game_c, depth-1, alpha, beta, False)[1]
+            game.drop_piece_in_column(col)
+            new_score = minimax(game, depth-1, alpha, beta, False)[1]
+            game.retract_piece_in_column(col)
             if new_score > value:
                 value = new_score
                 column = col
@@ -92,9 +91,9 @@ def minimax(game, depth, alpha, beta, maximizingPlayer):
         value = math.inf
         column = random.choice(valid_locations)
         for col in valid_locations:
-            game_c = copy.deepcopy(game)
-            game_c.drop_piece_in_column(col)
-            new_score = minimax(game_c, depth-1, alpha, beta, True)[1]
+            game.drop_piece_in_column(col)
+            new_score = minimax(game, depth-1, alpha, beta, True)[1]
+            game.retract_piece_in_column(col)
             if new_score < value:
                 value = new_score
                 column = col

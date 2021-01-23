@@ -5,7 +5,7 @@ import copy
 from timeit import default_timer as timer
 
 players_arr = ['John', 'Dave']
-score = {players_arr[0]: 0, players_arr[1]: 0, 'Draws': 0}
+score = {players_arr[0]: 0, players_arr[1]: 0, 'Draw': 0}
 
 
 def play_a_game(player_1, player_2):

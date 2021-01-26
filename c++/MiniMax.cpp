@@ -133,7 +133,7 @@ array<int, 2> mini_max(Connect4 game, int depth, int alpha, int beta, bool maxim
     {
       if (game.winning_move())
       {
-        score = 100000000000000;
+        score = numeric_limits<int>::max();
       }
       else
       {

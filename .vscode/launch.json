@@ -15,6 +15,18 @@
       "environment": [],
       "externalConsole": false,
       "MIMode": "lldb"
+    },
+    {
+      "name": "MCTS simulation",
+      "type": "cppdbg",
+      "request": "launch",
+      "program": "${workspaceFolder}/c++/MCTS/a.out",
+      "args": [],
+      "stopAtEntry": false,
+      "cwd": "${workspaceFolder}/c++/MCTS",
+      "environment": [],
+      "externalConsole": false,
+      "MIMode": "lldb"
     }
   ]
 }

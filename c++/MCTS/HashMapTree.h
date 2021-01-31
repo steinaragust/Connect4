@@ -65,6 +65,7 @@ class HashMapTree {
   TreeNodeLabel* get_root();
   TreeNodeLabel* get_node_label(Key &key);
   TreeNodeLabel* add_node(Key &key);
+  void print_map_size();
 
   private:
   TreeNodeLabel* _root;

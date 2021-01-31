@@ -39,3 +39,11 @@ TreeNodeLabel* HashMapTree::add_node(Key &key) {
   }
   return NULL;
 }
+
+void HashMapTree::print_map_size() {
+  int size = 0;
+  for(auto it=_node_labels.begin();it!=_node_labels.end();it++) {
+    size += 1; 
+  }
+  printf("Size of map: %d\n", size);
+}

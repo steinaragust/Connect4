@@ -5,7 +5,8 @@ using namespace std;
 
   void select(Connect4 &game, TreeNodeLabel *parent, vector<int> &path) {
     array<TreeNodeLabel*, COLUMNS> children = parent->get_children();
-    for (int i = 0; i < COLUMNS; i++) if (children[i] == NULL) {
+    // Hvað ef eitt child er aðeins null og það child er ekki valid column ?
+    for (int i = 0; i < COLUMNS; i++) if (children[i] == NULL && game.is_valid_column(i)) {
       game.drop_piece_in_column(i);
       path.push_back(i);
       return;
@@ -22,7 +23,7 @@ using namespace std;
       vector<int> moves = game.get_valid_columns();
       int random_move = rand() % moves.size();
       game.drop_piece_in_column(moves[random_move]);
-      path.push_back(random_move);
+      path.push_back(moves[random_move]);
     }
     if (game.winning_move()) {
       return 1;
@@ -38,10 +39,11 @@ using namespace std;
   }
 
   // Backup simulation (parent og pointer á child)
-  void backup_simulation(Connect4 &game, HashMapTree& tree, vector<int> &path, int value, int opponent) {
-    int _value = value == 0 ? 0 : game.get_to_move() == opponent ? 1 : -1;
+  void backup_simulation(Connect4 &game, HashMapTree& tree, vector<int> &path, int value, int player) {
+    int _value = value == 0 ? 0 : game.get_to_move() == player ? -1 : 1;
     int move = -1;
     TreeNodeLabel* child = NULL;
+    int nr = 0;
     for (vector<int>::reverse_iterator i = path.rbegin(); i != path.rend(); ++i ) { 
       array<array<int, COLUMNS>, ROWS> key = game.get_board();
       game.retract_piece_in_column(*i);
@@ -50,16 +52,20 @@ using namespace std;
       _value = -_value;
       move = *i;
       child = parent;
+      nr += 1;
+      // game.print_board();
     }
     Key key = game.get_board();
     TreeNodeLabel* parent = tree.get_node_label(key);
     backup_value(tree, key, parent, child, move, _value);
   }
 
-void simulate(Connect4 game, HashMapTree &tree) {
-  int opponent = game.get_to_move_opponent();
+void simulate(Connect4 &game, HashMapTree &tree) {
+  int player = game.get_to_move();
   vector<int> path;
   select(game, tree.get_root(), path);
   int value = playout(game, path);
-  backup_simulation(game, tree, path, value, opponent);
+  backup_simulation(game, tree, path, value, player);
+  // printf("Size of path: %d\n", path.size());
+  // tree.print_map_size();
 }

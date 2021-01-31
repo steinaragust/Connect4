@@ -31,7 +31,7 @@ array<TreeNodeLabel*, COLUMNS> TreeNodeLabel::get_children() {
 }
 
 int TreeNodeLabel::get_best_child() {
-  double best_child_value = numeric_limits<double>::min();
+  double best_child_value = numeric_limits<double>::lowest();
   int index = -1;
   for (int i = 0; i < COLUMNS; i++) {
     double child_value = UCT(i);

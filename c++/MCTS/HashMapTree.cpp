@@ -10,7 +10,7 @@ HashMapTree::~HashMapTree() {
   for (auto& it: _node_labels) {
     delete it.second;
   }
-  // delete _node_labels;
+  printf("Finished clearing memory");
 }
 
 HashMapTree::HashMapTree(const HashMapTree &copy) {}

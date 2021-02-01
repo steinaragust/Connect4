@@ -29,7 +29,7 @@ int evaluate_window(array<int, 4> window, Connect4 game)
   {
     player_pieces += window[i] == piece ? 1 : 0;
     opp_pieces += window[i] == opp_piece ? 1 : 0;
-    empty_pieces += window[i] == game.EMPTY ? 1 : 0;
+    empty_pieces += window[i] == game.EMPTY_PIECE ? 1 : 0;
   }
 
   if (player_pieces == game.WINDOW)

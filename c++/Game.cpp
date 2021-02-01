@@ -22,7 +22,7 @@ void Connect4::reset()
   {
     for (int j = 0; j < COLUMNS; j++)
     {
-      board[i][j] = 0;
+      board[i][j] = EMPTY_PIECE;
     }
   }
   no_moves = 0;
@@ -63,7 +63,7 @@ int Connect4::get_next_open_row(int column)
 {
   for (int i = 0; i < ROWS; i++)
   {
-    if (board[i][column] == 0)
+    if (board[i][column] == EMPTY_PIECE)
     {
       return i;
     }
@@ -105,7 +105,7 @@ void Connect4::drop_piece_in_column(int column)
 void Connect4::retract_piece_in_column(int column)
 {
   int row = get_next_open_row(column);
-  set_piece((row == -1 ? ROWS : row) - 1, column, EMPTY);
+  set_piece((row == -1 ? ROWS : row) - 1, column, EMPTY_PIECE);
   no_moves -= 1;
 }
 
@@ -117,7 +117,7 @@ void Connect4::set_piece(int row, int column, int piece)
 
 bool Connect4::is_valid_column(int column)
 {
-  return board[ROWS - 1][column] == 0;
+  return board[ROWS - 1][column] == EMPTY_PIECE;
 }
 
 bool Connect4::winning_move()

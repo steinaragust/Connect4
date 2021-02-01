@@ -34,9 +34,9 @@ public:
   void print_board();
 
   // Class constants
-  const int EMPTY = 1;
   const int PLAYER_1 = 0;
   const int PLAYER_2 = 1;
+  const int EMPTY_PIECE = 0;
   const int PLAYER_1_PIECE = 1;
   const int PLAYER_2_PIECE = 2;
   const int PIECE_PLAYER[2] = {PLAYER_1_PIECE, PLAYER_2_PIECE};

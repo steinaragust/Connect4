@@ -22,6 +22,19 @@ public:
   }
 };
 
+void print_iteration_value(IterationValue &value) {
+  printf("Column: %d\n", value.column);
+  printf("n values: ");
+  for (int i = 0; i < COLUMNS; i++) printf("%d ", value.n_values[i]);
+  printf("\n");
+  printf("q values: ");
+  for (int i = 0; i < COLUMNS; i++) printf("%d ", value.q_values[i]);
+  printf("\n");
+  printf("policy values: ");
+  for (int i = 0; i < COLUMNS; i++) printf("%f ", value.policy[i]);
+  printf("\n");
+}
+
 string play_game(Connect4 &game, MCTSAgent &player1, MCTSAgent &player2) {
   game.reset();
   while(!game.is_terminal_state()) {
@@ -30,6 +43,9 @@ string play_game(Connect4 &game, MCTSAgent &player1, MCTSAgent &player2) {
     if (turn == game.PLAYER_1) value = player1.play(game);
     else value = player2.play(game);
     game.drop_piece_in_column(value.column);
+    if (game.is_terminal_state()) {
+      print_iteration_value(value);
+    }
   }
   game.print_board();
   

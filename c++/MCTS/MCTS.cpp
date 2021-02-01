@@ -25,7 +25,7 @@ int playout (Connect4 &game, vector<int> &path) {
     game.drop_piece_in_column(moves[random_move]);
     path.push_back(moves[random_move]);
   }
-  if (game.winning_move()) {
+  if (game.winning_move()) {
     return 1;
   }
   return 0;

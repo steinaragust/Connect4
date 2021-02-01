@@ -2,20 +2,26 @@
 
 array<array<int, 2>, ROWS * COLUMNS> Hasher::zobrist = Hasher::intialize();
 
-HashMapTree::HashMapTree(Key &key) {
-  _root = add_node(key);
+HashMapTree::HashMapTree() {
+  _root = NULL;
+}
+
+HashMapTree::HashMapTree(Key &root_key) {
+  _root = add_node(root_key);
 }
 
 HashMapTree::~HashMapTree() {
-  for (auto& it: _node_labels) {
-    delete it.second;
-  }
-  printf("Finished clearing memory");
+  clear_map();
 }
 
 HashMapTree::HashMapTree(const HashMapTree &copy) {}
 
 TreeNodeLabel* HashMapTree::get_root() {
+  return _root;
+}
+
+TreeNodeLabel* HashMapTree::set_root(Key &root_key) {
+  _root = add_node(root_key);
   return _root;
 }
 
@@ -38,6 +44,14 @@ TreeNodeLabel* HashMapTree::add_node(Key &key) {
       return get_node_label(key);
   }
   return NULL;
+}
+
+void HashMapTree::clear_map() {
+    for (auto& it: _node_labels) {
+    delete it.second;
+  }
+  _node_labels.clear();
+  _root = NULL;
 }
 
 void HashMapTree::print_map_size() {

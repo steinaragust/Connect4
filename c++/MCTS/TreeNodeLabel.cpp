@@ -4,7 +4,6 @@ TreeNodeLabel::TreeNodeLabel() {
   _n = 0;
   _q = 0; // Average q gildi, [1, -1, 1, 1, ...] / n
   _p = 0;
-  _c = 0.2;
   for (int i = 0; i < COLUMNS; i++) {
     _children[i] = NULL;
   }
@@ -14,8 +13,20 @@ TreeNodeLabel::~TreeNodeLabel() {}
 
 TreeNodeLabel::TreeNodeLabel(const TreeNodeLabel &copy) {}
 
+int TreeNodeLabel::get_n() {
+  return _n;
+}
+
+int TreeNodeLabel::get_q() {
+  return _q;
+}
+
+int TreeNodeLabel::get_p() {
+  return _p;
+}
+
 double TreeNodeLabel::UCT(int i) {
-  return _children[i]->_q + _c * (sqrt((log(_n) / _children[i]->_n)));
+  return _children[i]->_q + C * (sqrt((log(_n) / _children[i]->_n)));
 }
 
 void TreeNodeLabel::add_visit(TreeNodeLabel* child, int index, int value) {

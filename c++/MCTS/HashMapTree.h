@@ -57,14 +57,17 @@ public:
 class HashMapTree {
   public:
   // Constructor/Deconstructor
-  HashMapTree(Key &key);
+  HashMapTree();
+  HashMapTree(Key &root_key);
   ~HashMapTree();
   HashMapTree(const HashMapTree &copy);
 
   //Public functions
+  TreeNodeLabel* set_root(Key &root_key);
   TreeNodeLabel* get_root();
   TreeNodeLabel* get_node_label(Key &key);
   TreeNodeLabel* add_node(Key &key);
+  void clear_map();
   void print_map_size();
 
   private:

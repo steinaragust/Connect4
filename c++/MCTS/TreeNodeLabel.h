@@ -1,6 +1,5 @@
 using namespace std;
 
-#include <vector>
 #include <array>
 #include "math.h"
 
@@ -9,6 +8,7 @@ using namespace std;
 
 const int ROWS = 6;
 const int COLUMNS = 7;
+const double C = 0.2;
 
 class TreeNodeLabel {
   public:
@@ -18,6 +18,9 @@ class TreeNodeLabel {
   TreeNodeLabel(const TreeNodeLabel &copy);
 
   // Functions
+  int get_n();
+  int get_q();
+  int get_p();
   void add_visit(TreeNodeLabel* child, int index, int value);
   array<TreeNodeLabel*, COLUMNS> get_children();
   int get_best_child();
@@ -28,7 +31,6 @@ class TreeNodeLabel {
   int _n;
   double _q;
   double _p;
-  double _c;
 };
 
 #endif // TREENODE_H

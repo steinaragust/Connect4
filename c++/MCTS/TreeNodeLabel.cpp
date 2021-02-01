@@ -34,6 +34,7 @@ int TreeNodeLabel::get_best_child() {
   double best_child_value = numeric_limits<double>::lowest();
   int index = -1;
   for (int i = 0; i < COLUMNS; i++) {
+    if (_children[i] == NULL) continue;
     double child_value = UCT(i);
     if (child_value > best_child_value) {
       index = i;

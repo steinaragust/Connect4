@@ -4,8 +4,8 @@ using namespace std;
 #include "HashMapTree.h"
 
   void select(Connect4 &game, TreeNodeLabel *parent, vector<int> &path) {
+    if (game.is_terminal_state()) return;
     array<TreeNodeLabel*, COLUMNS> children = parent->get_children();
-    // Hvað ef eitt child er aðeins null og það child er ekki valid column ?
     for (int i = 0; i < COLUMNS; i++) if (children[i] == NULL && game.is_valid_column(i)) {
       game.drop_piece_in_column(i);
       path.push_back(i);

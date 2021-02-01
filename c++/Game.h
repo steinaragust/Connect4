@@ -81,6 +81,7 @@ public:
     }
     printf("%s", string(COLUMNS + 2, '-').c_str());
     printf("\n");
+    // delete arr[];
   }
 
 private:

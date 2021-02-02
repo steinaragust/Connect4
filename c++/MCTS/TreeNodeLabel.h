@@ -20,10 +20,9 @@ class TreeNodeLabel {
 
   // Functions
   int get_n();
-  int get_q();
-  int get_p();
-  void add_visit(TreeNodeLabel* child, int index, int value);
-  void add_child(TreeNodeLabel* child, int index);
+  double get_q();
+  double get_p();
+  void add_visit(TreeNodeLabel* child, int index, double value);
   array<TreeNodeLabel*, COLUMNS> get_children();
   int get_best_child();
 

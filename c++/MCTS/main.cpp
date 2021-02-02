@@ -22,19 +22,6 @@ public:
   }
 };
 
-void print_iteration_value(IterationValue &value) {
-  printf("Column: %d\n", value.column);
-  printf("n values: ");
-  for (int i = 0; i < COLUMNS; i++) printf("%d ", value.n_values[i]);
-  printf("\n");
-  // printf("q values: ");
-  // for (int i = 0; i < COLUMNS; i++) printf("%f ", value.q_values[i]);
-  // printf("\n");
-  // printf("policy values: ");
-  // for (int i = 0; i < COLUMNS; i++) printf("%.2f", value.policy[i]); 
-  // printf("\n");
-}
-
 string play_game(Connect4 &game, MCTSAgent &player1, MCTSAgent &player2) {
   game.reset();
   while(!game.is_terminal_state()) {
@@ -43,8 +30,6 @@ string play_game(Connect4 &game, MCTSAgent &player1, MCTSAgent &player2) {
     if (turn == game.PLAYER_1) value = player1.play(game);
     else value = player2.play(game);
     game.drop_piece_in_column(value.column);
-    game.print_board();
-    print_iteration_value(value);
   }
   if (game.winning_move()) {
     if (game.get_to_move() == game.PLAYER_1) return player2.get_name();
@@ -60,9 +45,9 @@ int main() {
   Timer timer = Timer();
   timer.Start();
   string match1 = play_game(game, john, rick);
-  // string match2 = play_game(game, rick, john);
+  string match2 = play_game(game, rick, john);
   printf("Winner of match 1: %s\n", match1.c_str());
-  // printf("Winner of match 2: %s\n", match2.c_str());
-  // printf("Time: %f\n", timer.GetDuration());
+  printf("Winner of match 2: %s\n", match2.c_str());
+  printf("Time: %f\n", timer.GetDuration());
   return 0;
 }

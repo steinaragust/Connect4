@@ -3,17 +3,6 @@ using namespace std;
 #include "../Game.h"
 #include "HashMapTree.h"
 
-// void expansion(Connect4 &game, HashMapTree &tree, Key &key, vector<int> &available_columns) {
-//   TreeNodeLabel* node = tree.add_node(key);
-//   for(int column : available_columns) {
-//     game.drop_piece_in_column(column);
-//     Key child_key = game.get_board();
-//     TreeNodeLabel* child = tree.add_node(child_key);
-//     node->add_child(child, column);
-//     game.retract_piece_in_column(column);
-//   }
-// }
-
 void select(Connect4 &game, TreeNodeLabel *parent, vector<int> &path) {
   if (game.is_terminal_state()) {
     return;
@@ -30,7 +19,7 @@ void select(Connect4 &game, TreeNodeLabel *parent, vector<int> &path) {
   select(game, children[best_child], path);
 }
 
-int playout (Connect4 &game, vector<int> &path) {
+double playout (Connect4 &game, vector<int> &path) {
   int player = game.get_to_move();
   while (!game.is_terminal_state()) {
     vector<int> moves = game.get_valid_columns();
@@ -44,7 +33,7 @@ int playout (Connect4 &game, vector<int> &path) {
   return 0.5;
 }
 
-void backup_value(HashMapTree& tree, Key &key, TreeNodeLabel* &parent, TreeNodeLabel* child, int column, int value) {
+void backup_value(HashMapTree& tree, Key &key, TreeNodeLabel* &parent, TreeNodeLabel* child, int column, double value) {
   if (parent == NULL) {
     parent = tree.add_node(key);
   }
@@ -52,7 +41,7 @@ void backup_value(HashMapTree& tree, Key &key, TreeNodeLabel* &parent, TreeNodeL
 }
 
 // Backup simulation (parent og pointer á child)
-void backup_simulation(Connect4 &game, HashMapTree& tree, vector<int> &path, int value, int player) {
+void backup_simulation(Connect4 &game, HashMapTree& tree, vector<int> &path, double value) {
   int move = -1;
   TreeNodeLabel* child = NULL;
   for (vector<int>::reverse_iterator i = path.rbegin(); i != path.rend(); ++i ) { 
@@ -63,7 +52,6 @@ void backup_simulation(Connect4 &game, HashMapTree& tree, vector<int> &path, int
     value = -value;
     move = *i;
     child = parent;
-    // game.print_board();
   }
   Key key = game.get_board();
   TreeNodeLabel* parent = tree.get_node_label(key);
@@ -71,12 +59,8 @@ void backup_simulation(Connect4 &game, HashMapTree& tree, vector<int> &path, int
 }
 
 void simulate(Connect4 &game, HashMapTree &tree) {
-  int player = game.get_to_move();
   vector<int> path;
   select(game, tree.get_root(), path);
-  int value = playout(game, path);
-  backup_simulation(game, tree, path, value, player);
-  game.reset();
-  // printf("Size of path: %d\n", path.size());
-  // tree.print_map_size();
+  double value = playout(game, path);
+  backup_simulation(game, tree, path, value);
 }

@@ -16,7 +16,6 @@ struct IterationValue {
 class MCTSAgent {
   public:
   // Constructor/Deconstructor
-  MCTSAgent();
   MCTSAgent(string name = "MCTS Agent", int iterations = 200);
   ~MCTSAgent();
   MCTSAgent(const MCTSAgent &copy);
@@ -25,6 +24,7 @@ class MCTSAgent {
   string get_name();
   TreeNodeLabel* set_root(Key &root_key);
   void reset();
+  void print_iteration_value(IterationValue &value);
   IterationValue play(Connect4 game);
 
   private:

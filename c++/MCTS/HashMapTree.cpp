@@ -36,14 +36,14 @@ TreeNodeLabel* HashMapTree::get_node_label(Key &key) {
 }
 
 TreeNodeLabel* HashMapTree::add_node(Key &key) {
-  const TreeNodeLabel* item = get_node_label(key);
+  TreeNodeLabel* item = get_node_label(key);
   if (item == NULL) {
       TreeNodeLabel* new_label = new TreeNodeLabel();
       pair<Key, TreeNodeLabel*> new_pair(key, new_label);
       _node_labels.insert(new_pair);
       return get_node_label(key);
   }
-  return NULL;
+  return item;
 }
 
 void HashMapTree::clear_map() {

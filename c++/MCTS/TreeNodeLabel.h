@@ -1,6 +1,7 @@
 using namespace std;
 
 #include <array>
+#include <vector>
 #include "math.h"
 
 #ifndef TREENODELABEL_H
@@ -22,11 +23,13 @@ class TreeNodeLabel {
   int get_q();
   int get_p();
   void add_visit(TreeNodeLabel* child, int index, int value);
+  void add_child(TreeNodeLabel* child, int index);
   array<TreeNodeLabel*, COLUMNS> get_children();
   int get_best_child();
 
   private:
   double UCT(int i);
+  int chosen_index(double (&values)[COLUMNS], int best_value_index);
   array<TreeNodeLabel*, COLUMNS> _children;
   int _n;
   double _q;

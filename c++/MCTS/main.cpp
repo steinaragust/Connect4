@@ -27,12 +27,12 @@ void print_iteration_value(IterationValue &value) {
   printf("n values: ");
   for (int i = 0; i < COLUMNS; i++) printf("%d ", value.n_values[i]);
   printf("\n");
-  printf("q values: ");
-  for (int i = 0; i < COLUMNS; i++) printf("%d ", value.q_values[i]);
-  printf("\n");
-  printf("policy values: ");
-  for (int i = 0; i < COLUMNS; i++) printf("%f ", value.policy[i]);
-  printf("\n");
+  // printf("q values: ");
+  // for (int i = 0; i < COLUMNS; i++) printf("%f ", value.q_values[i]);
+  // printf("\n");
+  // printf("policy values: ");
+  // for (int i = 0; i < COLUMNS; i++) printf("%.2f", value.policy[i]); 
+  // printf("\n");
 }
 
 string play_game(Connect4 &game, MCTSAgent &player1, MCTSAgent &player2) {
@@ -43,12 +43,9 @@ string play_game(Connect4 &game, MCTSAgent &player1, MCTSAgent &player2) {
     if (turn == game.PLAYER_1) value = player1.play(game);
     else value = player2.play(game);
     game.drop_piece_in_column(value.column);
-    if (game.is_terminal_state()) {
-      print_iteration_value(value);
-    }
+    game.print_board();
+    print_iteration_value(value);
   }
-  game.print_board();
-  
   if (game.winning_move()) {
     if (game.get_to_move() == game.PLAYER_1) return player2.get_name();
     else return player1.get_name();
@@ -58,14 +55,14 @@ string play_game(Connect4 &game, MCTSAgent &player1, MCTSAgent &player2) {
 
 int main() {
   Connect4 game = Connect4();
-  MCTSAgent stalin = MCTSAgent("Stalin", 200);
-  MCTSAgent hitler = MCTSAgent("hitler", 200);
+  MCTSAgent john = MCTSAgent("John", 200);
+  MCTSAgent rick = MCTSAgent("Rick", 200);
   Timer timer = Timer();
   timer.Start();
-  string match1 = play_game(game, stalin, hitler);
-  string match2 = play_game(game, hitler, stalin);
+  string match1 = play_game(game, john, rick);
+  // string match2 = play_game(game, rick, john);
   printf("Winner of match 1: %s\n", match1.c_str());
-  printf("Winner of match 2: %s\n", match2.c_str());
-  printf("Time: %f\n", timer.GetDuration());
+  // printf("Winner of match 2: %s\n", match2.c_str());
+  // printf("Time: %f\n", timer.GetDuration());
   return 0;
 }

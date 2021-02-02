@@ -32,7 +32,7 @@ void MCTSAgent::reset() {
 IterationValue MCTSAgent::get_return_value(TreeNodeLabel* root) {
   int total = 0;
   int column = -1;
-  array<int, COLUMNS> q_values;
+  array<double, COLUMNS> q_values;
   array<int, COLUMNS> n_values;
   array<double, COLUMNS> policy;
   array<TreeNodeLabel*, COLUMNS> children = root->get_children();
@@ -44,7 +44,7 @@ IterationValue MCTSAgent::get_return_value(TreeNodeLabel* root) {
       total += n_values[i];
     } else {
       n_values[i] = numeric_limits<int>::min();
-      q_values[i] = numeric_limits<int>::min();
+      q_values[i] = numeric_limits<double>::lowest();
       policy[i] = numeric_limits<double>::lowest();
     }
   }
@@ -62,6 +62,7 @@ IterationValue MCTSAgent::get_return_value(TreeNodeLabel* root) {
 }
 
 IterationValue MCTSAgent::play(Connect4 game) {
+  reset();
   Key root_key = game.get_board();
   TreeNodeLabel* root_node = set_root(root_key);
 
@@ -70,6 +71,5 @@ IterationValue MCTSAgent::play(Connect4 game) {
   }
   
   IterationValue return_value = get_return_value(root_node);
-  reset();
   return return_value;
 }

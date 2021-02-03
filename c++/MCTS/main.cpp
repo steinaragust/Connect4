@@ -44,10 +44,12 @@ int main() {
   MCTSAgent rick = MCTSAgent("Rick", 200);
   Timer timer = Timer();
   timer.Start();
-  string match1 = play_game(game, john, rick);
-  string match2 = play_game(game, rick, john);
-  printf("Winner of match 1: %s\n", match1.c_str());
-  printf("Winner of match 2: %s\n", match2.c_str());
+  for (int i = 0; i < 10; i++) {
+    string match1 = play_game(game, john, rick);
+    string match2 = play_game(game, rick, john);
+  }
+  // printf("Winner of match 1: %s\n", match1.c_str());
+  // printf("Winner of match 2: %s\n", match2.c_str());
   printf("Time: %f\n", timer.GetDuration());
   return 0;
 }

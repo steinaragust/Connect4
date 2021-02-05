@@ -7,8 +7,8 @@ import math
 from timeit import default_timer as timer
 from array import array
 
-cppyy.include('Game.cpp')
-cppyy.include('MiniMax.cpp')
+cppyy.include('./Connect4-Game/Game.cpp')
+cppyy.include('./Connect4-Game/MiniMax.cpp')
 
 from cppyy.gbl import mini_max
 from cppyy.gbl import Connect4

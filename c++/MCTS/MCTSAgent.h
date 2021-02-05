@@ -1,7 +1,7 @@
 using namespace std;
 
 #include "HashMapTree.h"
-#include "../Game.h"
+#include "../Connect4-Game/Game.h"
 
 #ifndef MCTSAGENT_H
 #define MCTSAGENT_H

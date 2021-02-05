@@ -1,6 +1,6 @@
 using namespace std;
 
-#include "../Game.h"
+#include "../Connect4-Game/Game.h"
 #include "HashMapTree.h"
 
 void select(Connect4 &game, TreeNodeLabel *parent, vector<int> &path) {

@@ -6,6 +6,7 @@ from array import array
 import math
 from timeit import default_timer as timer
 from array import array
+import numpy as np
 
 cppyy.include('../Connect4-Game/Game.cpp')
 cppyy.include('TreeNodeLabel.cpp')
@@ -22,6 +23,8 @@ const int max_int = numeric_limits<int>::max();
 const int min_int = numeric_limits<int>::min();
 """)
 
+filename = 'end_states.txt'
+
 # Play match
 
 players_arr = ['John', 'Dave']
@@ -31,6 +34,8 @@ score = {players_arr[0]: 0, players_arr[1]: 0, 'Draw': 0}
 agent_1 = MCTSAgent.MCTSAgent(players_arr[0], 200)
 agent_2 = MCTSAgent.MCTSAgent(players_arr[1], 200)
 game = Connect4.Connect4()
+
+end_states = []
 
 def play_a_game(player_1, player_2):
     game = Connect4.Connect4()
@@ -46,6 +51,8 @@ def play_a_game(player_1, player_2):
         # print(array('d', obj.q_values))
         # print(array('d', obj.policy))
         game.drop_piece_in_column(obj.column)
+
+    end_states.append(np.array(game.get_board()))
     if game.winning_move():
         return player_1.get_name() if game.get_current_opponent_piece() == 0 else player_2.get_name()
     return 'Draw'
@@ -62,6 +69,12 @@ start_time = timer()
 for i in range(10):
     play_match()
 end_time = timer()
+
+out_file = open('end_states.txt', 'at')
+for state in end_states:
+    np.savetxt(out_file, state, '%d', ',', header='[', footer=']')
+
+out_file.close()
 
 print(score)
 print('Time: %f' % (end_time - start_time))

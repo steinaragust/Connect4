@@ -44,7 +44,7 @@ class OutputBlock(nn.Module):
         super(OutputBlock, self).__init__()
         # Value head
         self.conv = nn.Conv2d(128, 3, 1)
-        self.bn == nn.BatchNorm2d(3)
+        self.bn = nn.BatchNorm2d(3)
         self.fc1 = nn.Linear(3*6*7, 32)
         self.fc2 = nn.Linear(32, 1)
 
@@ -267,4 +267,6 @@ for i0, s in enumerate(arr):
             encoded[i0][arr[i0][i][j]][i][j] = 1
 
 net = ResNet()
-#y = net(encoded)
+tensor_arr = tensor(encoded, dtype=torch.float)
+y = net(tensor_arr)
+print(y)

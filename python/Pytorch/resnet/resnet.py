@@ -2,11 +2,20 @@ import numpy as np
 import torch
 import torch.nn as nn
 import torch.tensor as tensor
+import matplotlib.pyplot as plt
 from torch.utils.data import Dataset, DataLoader
 import torch.nn.functional as F
 from torch.nn.utils import clip_grad_norm_
 import torch.optim as optim
+
+# constants
 num_blocks = 19
+epochs = 40
+batch_size = 4
+update_size = 4
+learning_rate = 0.001
+max_norm = 1.0
+gradient_acc_step = 1
 
 class board_data(Dataset):
     def __init__(self, dataset): # dataset = np.array of (s, p, v)
@@ -322,7 +331,6 @@ for i0, s in enumerate(arr):
         for j in range(0, 7):
             encoded[i0][arr[i0][i][j]][i][j] = 1
 
-
 dataset_values = []
 
 for i in range(0, 20):
@@ -330,30 +338,56 @@ for i in range(0, 20):
 
 test_set = board_data(np.array(dataset_values, dtype=object))
 
-train_loader = DataLoader(test_set, batch_size=32, shuffle=True, num_workers=0, pin_memory=False)
+train_loader = DataLoader(test_set, batch_size=batch_size, shuffle=False, num_workers=0, pin_memory=False)
 
 net = ResNet()
 torch.manual_seed(0)
 net.train()
-optimizer = optim.Adam(net.parameters(), lr=0.001, betas=(0.8, 0.999))
+optimizer = optim.Adam(net.parameters(), lr=learning_rate, betas=(0.8, 0.999))
 scheduler = optim.lr_scheduler.MultiStepLR(optimizer, milestones=[50,100,150,200,250,300,400], gamma=0.77)
 criterion = AlphaLoss()
 
-for i,data in enumerate(train_loader):
-    state, policy, value = data
-    state, policy, value = state.float(), policy.float(), value.float()
-    policy_pred, value_pred = net(state)
-    loss = criterion(value_pred[:,0], value, policy_pred, policy)
-    loss = loss
-    loss.backward()
-    clip_grad_norm_(net.parameters(), 1)
-    optimizer.step()
-    optimizer.zero_grad()
-scheduler.step()
+losses_per_epoch = []
+for epoch in range(epochs):
+    total_loss = 0.0
+    losses_per_batch = []
+    for i,data in enumerate(train_loader):
+        state, policy, value = data
+        state, policy, value = state.float(), policy.float(), value.float()
+        policy_pred, value_pred = net(state)
+        loss = criterion(value_pred[:,0], value, policy_pred, policy)
+        loss = loss
+        loss.backward()
+        clip_grad_norm_(net.parameters(), max_norm)
+        optimizer.step()
+        optimizer.zero_grad()
 
-encoded = np.zeros([1,3,6,7])
+        total_loss += loss.item()
+        losses_per_batch.append(gradient_acc_step*total_loss/update_size)
+        print('[Epoch: %d, %5d/ %d points] total loss per batch: %.3f' %
+                (epoch + 1, (i + 1)*batch_size, len(test_set), losses_per_batch[-1]))
+        print("Policy (actual, predicted):",policy[0].argmax().item(),policy_pred[0].argmax().item())
+        print("Policy data:", policy[0]); print("Policy pred:", policy_pred[0])
+        print("Value (actual, predicted):", value[0].item(), value_pred[0,0].item())
+        print(" ")
+        total_loss = 0.0
+    scheduler.step()
+    if len(losses_per_batch) >= 1:
+        losses_per_epoch.append(sum(losses_per_batch)/len(losses_per_batch))
+
+fig = plt.figure()
+ax = fig.add_subplot(222)
+ax.scatter([e for e in range(0, len(losses_per_epoch))], losses_per_epoch)
+ax.set_xlabel("Epoch")
+ax.set_ylabel("Loss per batch")
+ax.set_title("Loss vs Epoch")
+plt.savefig('plots/results.png')
+plt.show()
+
+
 
 # try predict
+encoded = np.zeros([1,3,6,7])
 pred =  np.array([
                 [
                 [1,1,2,1,2,1,0],
@@ -363,6 +397,7 @@ pred =  np.array([
                 [0,0,0,2,2,0,0],
                 [0,0,0,0,0,0,0],
                 ]])
+
 for i0, s in enumerate(pred):
     for i in range(0, 6):
         for j in range(0, 7):

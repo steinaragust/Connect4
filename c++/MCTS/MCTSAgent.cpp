@@ -1,11 +1,12 @@
 #include "MCTSAgent.h"
 
-void simulate(Connect4 &game, HashMapTree &tree);
+void simulate(Connect4 &game, MCTSAgent &agent);
 
-MCTSAgent::MCTSAgent(string name, int iterations) {
+MCTSAgent::MCTSAgent(string name, int iterations, function<void(float *, int **, int)> NN_predict) {
   _name = name;
   _iterations = iterations;
   _tree = HashMapTree();
+  _predict = NN_predict; 
 }
 
 MCTSAgent::~MCTSAgent() {
@@ -13,6 +14,10 @@ MCTSAgent::~MCTSAgent() {
 
 string MCTSAgent::get_name() {
   return _name;
+}
+
+HashMapTree* MCTSAgent::get_tree() {
+  return &_tree;
 }
 
 TreeNodeLabel* MCTSAgent::set_root(Key &root_key) {
@@ -90,9 +95,30 @@ IterationValue MCTSAgent::play(Connect4 game) {
   Key root_key = game.get_board();
   TreeNodeLabel* root_node = set_root(root_key);
   for (int i = 0; i < _iterations; i++) {
-    simulate(game, _tree);
+    simulate(game, *this);
   }
   IterationValue return_value = get_return_value(root_node);
   // print_iteration_value(return_value);
   return return_value;
+}
+
+void MCTSAgent::set_predict(function<void(float *, int **, int)> f) {
+  _predict = f;
+}
+
+array<float, COLUMNS + 1>  MCTSAgent::call_predict(array<array<int, COLUMNS>, ROWS> board, int turn) {
+    int **_board = new int *[ROWS];
+    for (int i = 0; i < ROWS; i++) {
+      _board[i] = new int [COLUMNS];
+      for (int j = 0; j < COLUMNS; j++) {
+        _board[i][j] = board[i][j];
+      }
+    }
+    float *values = new float [COLUMNS + 1];
+    _predict(values, _board, turn);
+    array<float, COLUMNS + 1> return_values;
+    for (int i = 0; i < COLUMNS + 1; i++) {
+      return_values[i] = values[i];
+    }
+    return return_values;
 }

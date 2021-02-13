@@ -40,8 +40,8 @@ string play_game(Connect4 &game, MCTSAgent &player1, MCTSAgent &player2) {
 
 int main() {
   Connect4 game = Connect4();
-  MCTSAgent john = MCTSAgent("John", 200);
-  MCTSAgent rick = MCTSAgent("Rick", 200);
+  MCTSAgent john = MCTSAgent("John", 200, nullptr);
+  MCTSAgent rick = MCTSAgent("Rick", 200, nullptr);
   Timer timer = Timer();
   timer.Start();
   for (int i = 0; i < 10; i++) {

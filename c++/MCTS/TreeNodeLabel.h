@@ -23,6 +23,7 @@ class TreeNodeLabel {
   double get_q();
   double get_p();
   void add_visit(TreeNodeLabel* child, int index, double value);
+  void add_child(TreeNodeLabel* child, int index);
   array<TreeNodeLabel*, COLUMNS> get_children();
   int get_best_child();
 

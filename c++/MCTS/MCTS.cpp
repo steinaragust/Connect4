@@ -3,7 +3,40 @@ using namespace std;
 #include "../Connect4-Game/Game.h"
 #include "MCTSAgent.h"
 
-void expand(Connect4 &game, TreeNodeLabel* node,  HashMapTree *tree) {
+void expand(Connect4 &game, TreeNodeLabel* node,  MCTSAgent &agent) {
+  vector<Key> states;
+  vector<int> turns;
+
+  // Add parent initially
+  Key p_key = game.get_board();
+  states.push_back(p_key);
+  turns.push_back(game.get_to_move());
+
+  HashMapTree* tree = agent.get_tree();
+
+  // Add children
+  vector<int> valid_moves = game.get_valid_columns();
+  for (int m : valid_moves) {
+    game.drop_piece_in_column(m);
+    Key c_key = game.get_board();
+    TreeNodeLabel* c_node = tree->add_node(c_key);
+    node->add_child(c_node, m);
+    
+    if (c_node->get_p() == -1) {
+      states.push_back(c_key);
+      turns.push_back(game.get_to_move());
+    }
+    game.retract_piece_in_column(m);
+  }
+
+  array<float, COLUMNS + 1> values = agent.call_predict(states, turns);
+  // Klára að stilla q fyrir það sem kemur úr "values"
+  TreeNodeLabel* children_nodes = node->get_children();
+  for(int i = 0; i < COLUMNS; i++) {
+    if (children_nodes[i]->get_q() == -1) {
+
+    }
+  }
 }
 
 void select(Connect4 &game, TreeNodeLabel *parent, vector<int> &path) {

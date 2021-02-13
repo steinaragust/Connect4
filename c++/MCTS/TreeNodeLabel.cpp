@@ -3,7 +3,7 @@
 TreeNodeLabel::TreeNodeLabel() {
   _n = 0;
   _q = 0; // Average q gildi, [1, -1, 1, 1, ...] / n
-  _p = 0;
+  _p = -1;
   for (int i = 0; i < COLUMNS; i++) {
     _children[i] = NULL;
   }
@@ -36,6 +36,10 @@ void TreeNodeLabel::add_visit(TreeNodeLabel* child, int index, double value) {
   }
   _n += 1;
   _q += (value - _q) / _n;
+}
+
+void TreeNodeLabel::add_child(TreeNodeLabel* child, int index) {
+  _children[index] = child;
 }
 
 array<TreeNodeLabel*, COLUMNS> TreeNodeLabel::get_children() {

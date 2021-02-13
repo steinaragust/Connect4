@@ -2,7 +2,7 @@
 
 void simulate(Connect4 &game, MCTSAgent &agent);
 
-MCTSAgent::MCTSAgent(string name, int iterations, function<void(float *, int **, int)> NN_predict) {
+MCTSAgent::MCTSAgent(string name, int iterations, function<void(float *, vector<Key>, vector<int>)> NN_predict) {
   _name = name;
   _iterations = iterations;
   _tree = HashMapTree();
@@ -102,23 +102,25 @@ IterationValue MCTSAgent::play(Connect4 game) {
   return return_value;
 }
 
-void MCTSAgent::set_predict(function<void(float *, int **, int)> f) {
+void MCTSAgent::set_predict(function<void(float *, vector<Key>, vector<int>)> f) {
   _predict = f;
 }
 
-array<float, COLUMNS + 1>  MCTSAgent::call_predict(array<array<int, COLUMNS>, ROWS> board, int turn) {
-    int **_board = new int *[ROWS];
-    for (int i = 0; i < ROWS; i++) {
-      _board[i] = new int [COLUMNS];
-      for (int j = 0; j < COLUMNS; j++) {
-        _board[i][j] = board[i][j];
-      }
+void MCTSAgent::fill_state(Key &destination, int **source) {
+  for (int r = 0; r < ROWS; r++) {
+    source[r] = new int[COLUMNS];
+    for (int c = 0; c < COLUMNS; c++) {
+      source[r][c] = destination[r][c];
     }
-    float *values = new float [COLUMNS + 1];
-    _predict(values, _board, turn);
-    array<float, COLUMNS + 1> return_values;
-    for (int i = 0; i < COLUMNS + 1; i++) {
-      return_values[i] = values[i];
-    }
-    return return_values;
+  }
+}
+
+array<float, COLUMNS + 1> MCTSAgent::call_predict(vector<Key> &states, vector<int> &turns) {
+  float *values = new float [COLUMNS + 1];
+  _predict(values, states, turns);
+  array<float, COLUMNS + 1> return_values;
+  for (int i = 0; i < COLUMNS + 1; i++) {
+    return_values[i] = values[i];
+  }
+  return return_values;
 }

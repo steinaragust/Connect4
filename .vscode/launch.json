@@ -5,18 +5,6 @@
   "version": "0.2.0",
   "configurations": [
     {
-      "name": "(lldb) Launch",
-      "type": "cppdbg",
-      "request": "launch",
-      "program": "${workspaceFolder}/c++/a.out",
-      "args": [],
-      "stopAtEntry": false,
-      "cwd": "${workspaceFolder}/c++",
-      "environment": [],
-      "externalConsole": false,
-      "MIMode": "lldb"
-    },
-    {
       "name": "MCTS simulation",
       "type": "cppdbg",
       "request": "launch",

@@ -1,12 +1,14 @@
 #include "MCTSAgent.h"
 
 void simulate(Connect4 &game, MCTSAgent &agent);
+void expand(Connect4 &game, TreeNodeLabel* node,  MCTSAgent &agent);
 
-MCTSAgent::MCTSAgent(string name, int iterations, function<void(float *, vector<Key>, vector<int>)> NN_predict) {
+MCTSAgent::MCTSAgent(string name, int iterations, function<void(double *, vector<Key>, vector<int>)> NN_predict) {
   _name = name;
   _iterations = iterations;
   _tree = HashMapTree();
-  _predict = NN_predict; 
+  _predict = NN_predict;
+  use_NN_predict = NN_predict != nullptr;
 }
 
 MCTSAgent::~MCTSAgent() {
@@ -43,7 +45,7 @@ IterationValue MCTSAgent::get_return_value(TreeNodeLabel* root) {
     } else {
       n_values[i] = numeric_limits<int>::min();
       q_values[i] = numeric_limits<double>::lowest();
-      policy[i] = numeric_limits<double>::lowest();
+      policy[i] = 0.0;
     }
   }
   int max_visits = numeric_limits<int>::min();
@@ -94,6 +96,8 @@ IterationValue MCTSAgent::play(Connect4 game) {
   reset();
   Key root_key = game.get_board();
   TreeNodeLabel* root_node = set_root(root_key);
+  expand(game, root_node, *this);
+  
   for (int i = 0; i < _iterations; i++) {
     simulate(game, *this);
   }
@@ -102,7 +106,7 @@ IterationValue MCTSAgent::play(Connect4 game) {
   return return_value;
 }
 
-void MCTSAgent::set_predict(function<void(float *, vector<Key>, vector<int>)> f) {
+void MCTSAgent::set_predict(function<void(double *, vector<Key>, vector<int>)> f) {
   _predict = f;
 }
 
@@ -115,12 +119,13 @@ void MCTSAgent::fill_state(Key &destination, int **source) {
   }
 }
 
-array<float, COLUMNS + 1> MCTSAgent::call_predict(vector<Key> &states, vector<int> &turns) {
-  float *values = new float [COLUMNS + 1];
+array<double, COLUMNS + 1> MCTSAgent::call_predict(vector<Key> &states, vector<int> &turns) {
+  double *values = new double [COLUMNS + 1];
   _predict(values, states, turns);
-  array<float, COLUMNS + 1> return_values;
+  array<double, COLUMNS + 1> return_values;
   for (int i = 0; i < COLUMNS + 1; i++) {
     return_values[i] = values[i];
   }
+  // Last index is state value, which is not used for training
   return return_values;
 }

@@ -3,7 +3,8 @@
 TreeNodeLabel::TreeNodeLabel() {
   _n = 0;
   _q = 0; // Average q gildi, [1, -1, 1, 1, ...] / n
-  _p = -1;
+  _p = 0;
+  _expanded = false;
   for (int i = 0; i < COLUMNS; i++) {
     _children[i] = NULL;
   }
@@ -25,9 +26,26 @@ double TreeNodeLabel::get_p() {
   return _p;
 }
 
+bool TreeNodeLabel::get_expanded() {
+  return _expanded;
+}
+
+void TreeNodeLabel::set_p(double value) {
+  _p = value;
+}
+
+void TreeNodeLabel::set_is_expanded() {
+  _expanded = true;
+}
+
 double TreeNodeLabel::UCT(int i) {
   if (_children[i]->_n == 0) return numeric_limits<double>::max();
   return _children[i]->_q + C * (sqrt(log(_n) / _children[i]->_n));
+}
+
+double TreeNodeLabel::PUCT(int i) {
+  if (_children[i]->_n == 0) return numeric_limits<double>::max();
+  return _children[i]->_q + _children[i]->_p * C * (sqrt(log(_n) / _children[i]->_n));
 }
 
 void TreeNodeLabel::add_visit(TreeNodeLabel* child, int index, double value) {
@@ -58,7 +76,7 @@ int TreeNodeLabel::chosen_index(double (&values)[COLUMNS], int best_value_index)
   return available_columns[random_move];
 }
 
-int TreeNodeLabel::get_best_child() {
+int TreeNodeLabel::get_best_child(bool use_PUCT) {
   double best_child_value = numeric_limits<double>::lowest();
   double child_values[COLUMNS];
   int index = -1;
@@ -67,7 +85,7 @@ int TreeNodeLabel::get_best_child() {
       child_values[i] = numeric_limits<double>::lowest();
       continue;
     }
-    double child_value = UCT(i);
+    double child_value = use_PUCT ? PUCT(i) : UCT(i);
     child_values[i] = child_value;
     if (child_value > best_child_value) {
       best_child_value = child_value;

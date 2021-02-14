@@ -22,18 +22,23 @@ class TreeNodeLabel {
   int get_n();
   double get_q();
   double get_p();
+  bool get_expanded();
+  void set_p(double value);
+  void set_is_expanded();
   void add_visit(TreeNodeLabel* child, int index, double value);
   void add_child(TreeNodeLabel* child, int index);
   array<TreeNodeLabel*, COLUMNS> get_children();
-  int get_best_child();
+  int get_best_child(bool use_PUCT);
 
   private:
   double UCT(int i);
+  double PUCT(int i);
   int chosen_index(double (&values)[COLUMNS], int best_value_index);
   array<TreeNodeLabel*, COLUMNS> _children;
   int _n;
   double _q;
   double _p;
+  bool _expanded;
 };
 
 #endif // TREENODE_H

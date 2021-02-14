@@ -31,6 +31,7 @@ string play_game(Connect4 &game, MCTSAgent &player1, MCTSAgent &player2) {
     else value = player2.play(game);
     game.drop_piece_in_column(value.column);
   }
+  game.print_board();
   if (game.winning_move()) {
     if (game.get_to_move() == game.PLAYER_1) return player2.get_name();
     else return player1.get_name();
@@ -44,7 +45,7 @@ int main() {
   MCTSAgent rick = MCTSAgent("Rick", 200, nullptr);
   Timer timer = Timer();
   timer.Start();
-  for (int i = 0; i < 10; i++) {
+  for (int i = 0; i < 3; i++) {
     string match1 = play_game(game, john, rick);
     string match2 = play_game(game, rick, john);
   }

@@ -16,7 +16,7 @@ struct IterationValue {
 class MCTSAgent {
   public:
   // Constructor/Deconstructor
-  MCTSAgent(string name = "MCTSAgent", int iterations = 200, function<void(double *, vector<Key>, vector<int>)> NN_predict = nullptr);
+  MCTSAgent(string name = "MCTSAgent", int iterations = 200);
   ~MCTSAgent();
   MCTSAgent(const MCTSAgent &copy);
 
@@ -29,14 +29,15 @@ class MCTSAgent {
   IterationValue play(Connect4 game);
 
   // NN methods
-  void set_predict(function<void(double *, vector<Key>, vector<int>)> f);
-  array<double, COLUMNS + 1> call_predict(vector<Key> &states, vector<int> &turns);
+  void set_predict(function<void(double[8], int ***, int, int)> f);
+  array<double, COLUMNS + 1> call_predict(vector<Key> &states, int turn);
 
   bool use_NN_predict;
 
   private:
-  void fill_state(Key &destination, int **source);
-  function<void(double *, vector<Key>, vector<int>)> _predict;
+  void fill_states(vector<Key> &states, int ***_states);
+  void free_states(int ***states, int length);
+  function<void(double[8], int ***, int, int)> _predict;
   IterationValue get_return_value(TreeNodeLabel* root);
 
   string _name;

@@ -2,7 +2,10 @@ import cppyy
 import numpy as np
 import torch
 import torch.tensor as tensor
+from cppyy import ll
 from array import array
+from resnet import ResNet
+from utils import encode_for_predict
 
 cppyy.include('../Connect4-Game/Game.cpp')
 cppyy.include('../MCTS/TreeNodeLabel.cpp')
@@ -15,30 +18,27 @@ from cppyy.gbl import Connect4
 
 class MCTS_Trainer:
   def __init__(self, model, simulations = 200):
+    self.turn = 0
     self.model = model
-    self.states = np.array()
-    self.turns = np.array()
-    self.policies = np.array()
-    self.values = np.array()
+    self.states = np.array([])
+    self.turns = np.array([])
+    self.policies = np.array([])
+    self.values = np.array([])
     self.agent_1 = MCTSAgent.MCTSAgent('AZ_Agent_0', simulations)
     self.agent_2 = MCTSAgent.MCTSAgent('AZ_Agent_1', simulations)
-    self.agent_1.set_predict(self.predict)
-    self.agent_2.set_predict(self.predict)
     self.score = {'AZ_Agent_0': 0, 'AZ_Agent_1': 0, 'Draw': 0}
+    self.agent_1.set_predict(prufa)
+    self.agent_2.set_predict(prufa)
 
-  def predict(self, values, board, turn):
-    encoded = np.zeros([1,3,6,7]).astype(int)
-    for r in range(0, 6):
-      for c in range(0, 7):
-        if (board[r][c] != 0):
-          channel = board[r][c] - 1
-          encoded[0][channel][r][c] = 1
-    encoded[0, 2, :, :] = turn
-    tensor_arr = tensor(encoded, dtype=torch.float)
+  def predict(self, states, values):
+    tensor_arr = tensor(states, dtype=torch.float)
     policy_pred, value_pred = self.model(tensor_arr)
     for i in range(0, 7):
       values[i] = policy_pred[0][i].item()
     values[7] = value_pred[0][0].item()
+    print('values in python: ')
+    print(policy_pred)
+    print('\n')
 
   def play_a_game(self, player_1, player_2):
     game = Connect4.Connect4()
@@ -59,12 +59,20 @@ class MCTS_Trainer:
         # print(array('d', obj.policy))
         game.drop_piece_in_column(obj.column)
     if game.winning_move():
-        return player_1 if game.get_current_opponent_piece() == 0 else player_2
+        return player_1.get_name() if game.get_current_opponent_piece() == 0 else player_2.get_name()
     return 'Draw'
   
   def play_matches(self, n_matches = 100):
     for _ in range(n_matches):
-      first = self.play_a_game(self.agent_1.get_name(), self.agent_2.get_name())
-      second = self.play_a_game(self.agent_2.get_name(), self.agent_1.get_name())
+      first = self.play_a_game(self.agent_1, self.agent_2)
+      second = self.play_a_game(self.agent_2, self.agent_1)
       self.score[first] += 1
       self.score[second] += 1
+
+def prufa(values, states, turn, n_states):
+  encoded = encode_for_predict(states, turn, n_states)
+  trainer.predict(encoded, values)
+
+model = ResNet()
+trainer = MCTS_Trainer(model)
+trainer.play_matches(1)

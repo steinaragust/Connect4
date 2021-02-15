@@ -5,9 +5,10 @@ using namespace std;
 
 void expand(Connect4 &game, TreeNodeLabel* node,  MCTSAgent &agent) {
   vector<Key> states;
-  vector<int> turns;
 
   HashMapTree* tree = agent.get_tree();
+
+  int turn = game.get_to_move_opponent();
 
   // Add children
   vector<int> valid_moves = game.get_valid_columns();
@@ -18,12 +19,11 @@ void expand(Connect4 &game, TreeNodeLabel* node,  MCTSAgent &agent) {
     node->add_child(c_node, m);
     
     states.push_back(c_key);
-    turns.push_back(game.get_to_move());
     game.retract_piece_in_column(m);
   }
 
   if (agent.use_NN_predict) {
-    array<double, COLUMNS + 1> values = agent.call_predict(states, turns);
+    array<double, COLUMNS + 1> values = agent.call_predict(states, turn);
     array<TreeNodeLabel*, COLUMNS> children = node->get_children();
     for (int m : valid_moves) {
       children[m]->set_p(values[m]);

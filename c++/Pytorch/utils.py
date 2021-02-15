@@ -16,9 +16,8 @@ def encode_for_training(samples):
     return encoded
     
 def encode_for_predict(states, turn, n_states):
-    last_index = n_states - 1
-    encoded = np.zeros([last_index,3,6,7]).astype(int)
-    for i in range(0, last_index):
+    encoded = np.zeros([n_states,3,6,7]).astype(int)
+    for i in range(0, n_states):
         sp = ll.cast['int**'](states[i])
         for r in range(0, 6):
             rp = ll.cast['int*'](sp[r])

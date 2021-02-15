@@ -30,19 +30,16 @@ class MCTS_Trainer:
     self.agent_1.set_predict(prufa)
     self.agent_2.set_predict(prufa)
 
-  def predict(self, states, values):
+  def predict(self, states, values, n_states):
     tensor_arr = tensor(states, dtype=torch.float)
     policy_pred, value_pred = self.model(tensor_arr)
-    for i in range(0, 7):
-      values[i] = policy_pred[0][i].item()
-    values[7] = value_pred[0][0].item()
-    print('values in python: ')
-    print(policy_pred)
-    print('\n')
+    for i in range(n_states):
+      for j in range(0, 7):
+        values[i][j] = policy_pred[i][j].item()
+      values[i][7] = value_pred[i][0].item()
 
   def play_a_game(self, player_1, player_2):
     game = Connect4.Connect4()
-
     while(not game.is_terminal_state()):
         turn = game.get_to_move()
         obj = None
@@ -50,10 +47,11 @@ class MCTS_Trainer:
             obj = player_1.play(game)
         else:
             obj = player_2.play(game)
-        self.states.append(np.array(game.get_board()))
-        self.turns.append(turn)
-        self.columns.append(obj.column)
-        self.policies.append(array('f', obj.policy))
+        print(array('f', obj.policy))
+        self.states = np.append(self.states, game.get_board())
+        self.turns = np.append(self.turns, turn)
+        self.policies = np.append(self.policies, list(array('f', obj.policy)))
+        print(self.policies)
         # print(array('d', obj.n_values))
         # print(array('d', obj.q_values))
         # print(array('d', obj.policy))
@@ -71,7 +69,7 @@ class MCTS_Trainer:
 
 def prufa(values, states, turn, n_states):
   encoded = encode_for_predict(states, turn, n_states)
-  trainer.predict(encoded, values)
+  trainer.predict(encoded, values, n_states)
 
 model = ResNet()
 trainer = MCTS_Trainer(model)

@@ -23,21 +23,21 @@ class MCTSAgent {
   // Public methods
   string get_name();
   HashMapTree* get_tree();
-  TreeNodeLabel* set_root(Key &root_key);
+  TreeNodeLabel* set_root(Key &root_key, int turn);
   void reset();
   void print_iteration_value(IterationValue &value);
   IterationValue play(Connect4 game);
 
   // NN methods
-  void set_predict(function<void(double[8], int ***, int, int)> f);
-  array<double, COLUMNS + 1> call_predict(vector<Key> &states, int turn);
+  void set_predict(function<void(double**, int ***, int, int)> f);
+  void call_predict(vector<Key> &states, array<TreeNodeLabel*, COLUMNS> &nodes, int turn);
 
   bool use_NN_predict;
 
   private:
   void fill_states(vector<Key> &states, int ***_states);
   void free_states(int ***states, int length);
-  function<void(double[8], int ***, int, int)> _predict;
+  function<void(double**, int ***, int, int)> _predict;
   IterationValue get_return_value(TreeNodeLabel* root);
 
   string _name;

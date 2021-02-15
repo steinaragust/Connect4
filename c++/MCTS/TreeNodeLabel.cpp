@@ -3,14 +3,16 @@
 TreeNodeLabel::TreeNodeLabel() {
   _n = 0;
   _q = 0; // Average q gildi, [1, -1, 1, 1, ...] / n
-  _p = 0;
+  for (int i =  0; i < COLUMNS; i++) _p[i] = 0;
   _expanded = false;
   for (int i = 0; i < COLUMNS; i++) {
     _children[i] = NULL;
   }
 }
 
-TreeNodeLabel::~TreeNodeLabel() {}
+TreeNodeLabel::~TreeNodeLabel() {
+
+}
 
 TreeNodeLabel::TreeNodeLabel(const TreeNodeLabel &copy) {}
 
@@ -22,7 +24,7 @@ double TreeNodeLabel::get_q() {
   return _q;
 }
 
-double TreeNodeLabel::get_p() {
+array<double, COLUMNS> TreeNodeLabel::get_p() {
   return _p;
 }
 
@@ -30,8 +32,8 @@ bool TreeNodeLabel::get_expanded() {
   return _expanded;
 }
 
-void TreeNodeLabel::set_p(double value) {
-  _p = value;
+void TreeNodeLabel::set_p(double* value) {
+  for (int i = 0; i < COLUMNS; i++) _p[i] = value[i];
 }
 
 void TreeNodeLabel::set_is_expanded() {
@@ -45,7 +47,7 @@ double TreeNodeLabel::UCT(int i) {
 
 double TreeNodeLabel::PUCT(int i) {
   if (_children[i]->_n == 0) return numeric_limits<double>::max();
-  return _children[i]->_q + _children[i]->_p * C * (sqrt(log(_n) / _children[i]->_n));
+  return _children[i]->_q + _p[i] * C * (sqrt(log(_n) / _children[i]->_n));
 }
 
 void TreeNodeLabel::add_visit(TreeNodeLabel* child, int index, double value) {

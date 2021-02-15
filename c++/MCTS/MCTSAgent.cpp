@@ -23,8 +23,13 @@ HashMapTree* MCTSAgent::get_tree() {
   return &_tree;
 }
 
-TreeNodeLabel* MCTSAgent::set_root(Key &root_key) {
-  return _tree.set_root(root_key);
+TreeNodeLabel* MCTSAgent::set_root(Key &root_key, int turn) {
+  TreeNodeLabel* root = _tree.set_root(root_key);
+  vector<Key> state;
+  state.push_back(root_key);
+  array<TreeNodeLabel*, COLUMNS> node_p = { root, NULL, NULL, NULL, NULL, NULL, NULL };
+  call_predict(state, node_p, turn);
+  return root;
 }
 
 void MCTSAgent::reset() {
@@ -96,19 +101,18 @@ void MCTSAgent::print_iteration_value(IterationValue &value) {
 IterationValue MCTSAgent::play(Connect4 game) {
   reset();
   Key root_key = game.get_board();
-  TreeNodeLabel* root_node = set_root(root_key);
+  int turn = game.get_to_move();
+  TreeNodeLabel* root_node = set_root(root_key, turn);
   expand(game, root_node, *this);
   
   for (int i = 0; i < _iterations; i++) {
     simulate(game, *this);
   }
   IterationValue return_value = get_return_value(root_node);
-  // print_iteration_value(return_value);
-  printf("Returning \n");
   return return_value;
 }
 
-void MCTSAgent::set_predict(function<void(double[8], int ***, int, int)> f) {
+void MCTSAgent::set_predict(function<void(double**, int ***, int, int)> f) {
   use_NN_predict = true;
   _predict = f;
 }
@@ -133,8 +137,12 @@ void MCTSAgent::free_states(int ***states, int length) {
   delete[] states;
 }
 
-array<double, COLUMNS + 1> MCTSAgent::call_predict(vector<Key> &states, int turn) {
-  double *_values = new double [COLUMNS + 1];
+void MCTSAgent::call_predict(vector<Key> &states, array<TreeNodeLabel*, COLUMNS> &nodes, int turn) {
+  double ** values = new double*[states.size()];
+   for (int s = 0; s < states.size(); s++) {
+    values[s] = new double[COLUMNS + 1];
+  }
+
   int*** _states = new int**[states.size()];
   for (int s = 0; s < states.size(); s++) {
     _states[s] = new int*[ROWS];
@@ -142,19 +150,23 @@ array<double, COLUMNS + 1> MCTSAgent::call_predict(vector<Key> &states, int turn
       _states[s][r] = new int[COLUMNS];
     }
   }
+
   fill_states(states, _states);
-  _predict(_values, _states, turn, states.size());
-  array<double, COLUMNS + 1> return_values;
-  for (int i = 0; i < COLUMNS + 1; i++) {
-    return_values[i] = _values[i];
+  _predict(values, _states, turn, states.size());
+
+  // vector<double> state_values;
+
+  int j = 0;
+  for (int i = 0; i < COLUMNS; i++) {
+    if (nodes[i] != NULL) {
+      nodes[i]->set_p(values[j]);
+      // state_values.push_back(values[j][8]); // state value
+      delete[] values[j];
+      j += 1;
+    }
   }
   free_states(_states, states.size());
+  delete [] values;
 
-  // for (int i = 0; i < COLUMNS + 1; i++) {
-  //   printf("%lf ", return_values[i]);
-  // }
-  // printf("\n");
-
-  // Last index is state value, which is not used for training
-  return return_values;
+  return;
 }

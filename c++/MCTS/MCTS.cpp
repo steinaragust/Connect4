@@ -21,13 +21,9 @@ void expand(Connect4 &game, TreeNodeLabel* node,  MCTSAgent &agent) {
     states.push_back(c_key);
     game.retract_piece_in_column(m);
   }
-
   if (agent.use_NN_predict) {
-    array<double, COLUMNS + 1> values = agent.call_predict(states, turn);
     array<TreeNodeLabel*, COLUMNS> children = node->get_children();
-    for (int m : valid_moves) {
-      children[m]->set_p(values[m]);
-    }
+    agent.call_predict(states, children, turn);
   }
   node->set_is_expanded();
 }
@@ -70,7 +66,6 @@ void backup_value(HashMapTree* tree, Key &key, TreeNodeLabel* &parent, TreeNodeL
   parent->add_visit(child, column, value);
 }
 
-// Backup simulation (parent og pointer á child)
 void backup_simulation(Connect4 &game, HashMapTree* tree, vector<int> &path, double value) {
   int move = -1;
   TreeNodeLabel* child = NULL;

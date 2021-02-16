@@ -2,6 +2,27 @@ import numpy as np
 from cppyy import ll
 from array import array
 
+def encode_for_training_1(states, turns, policies, values):
+    states = encode_states(states, turns)
+    policies =[list(x) for x in policies] 
+    values = list(values)
+    return np.array([states, np.array(policies), np.array(values)], dtype=object)
+
+
+def encode_states(samples, turns):
+    n_samples = len(samples)
+    encoded = np.zeros([n_samples,3,6,7]).astype(int)
+    for i in range(0, n_samples):
+        s = samples[i]
+        for r in range(0, 6):
+            for c in range(0, 7):
+                if s[r][c] != 0:
+                    channel = s[r][c] - 1
+                    encoded[i][channel][r][c] = 1
+        encoded[i,2,:,:] = turns[i]
+    return encoded
+
+
 def encode_for_training(samples):
     last_index = len(samples) - 1
     encoded = np.zeros([last_index,3,6,7]).astype(int)

@@ -5,7 +5,7 @@ import torch.tensor as tensor
 from cppyy import ll
 from array import array
 from resnet import ResNet
-from utils import encode_for_predict
+from utils import encode_for_predict, encode_for_training_1
 from os import listdir
 from os.path import isfile, join
 import re
@@ -25,13 +25,9 @@ from cppyy.gbl import Connect4
 class MCTS_Trainer:
   def __init__(self, model, simulations = 200):
     self.model = model
-    self.states = []
-    self.turns = []
-    self.policies = []
-    self.values = []
+    self.clear()
     self.agent_1 = MCTSAgent.MCTSAgent('AZ_Agent_0', simulations)
     self.agent_2 = MCTSAgent.MCTSAgent('AZ_Agent_1', simulations)
-    self.score = {'AZ_Agent_0': 0, 'AZ_Agent_1': 0, 'Draw': 0}
     # self.agent_1.set_predict(predict)
     # self.agent_2.set_predict(predict)
 
@@ -55,6 +51,7 @@ class MCTS_Trainer:
         self.states.append(game.get_board())
         self.turns.append(turn)
         self.policies.append(list(array('f', obj.policy)))
+        self.values.append(obj.q_value)
         game.drop_piece_in_column(obj.column)
     if game.winning_move():
         return player_1.get_name() if game.get_current_opponent_piece() == 0 else player_2.get_name()
@@ -72,17 +69,23 @@ class MCTS_Trainer:
     self.turns = []
     self.policies = []
     self.values = []
+    self.score = {'AZ_Agent_0': 0, 'AZ_Agent_1': 0, 'Draw': 0}
 
   def save_dataset(self):
+    file_n = 0
     files = [f for f in listdir(dataset_path) if isfile(join(dataset_path, f))]
-    numbers = []
-    for f in files:
-      m = re.search('^dataset_(\d+)\.npy$', f)
-      numbers.append(int(m.group(1)))
-    file_n = max(numbers) + 1
-    test = np.array([1, 2, 3.0])
-    fpath = dataset_path + '/dataset_' + str(file_n) + '.npy'
-    np.save(fpath, test)
+    if len(files) != 0:
+      numbers = []
+      for f in files:
+        m = re.search('^dataset_(\d+)\.npy$', f)
+        numbers.append(int(m.group(1)))
+      file_n = max(numbers) + 1
+    data = encode_for_training_1(self.states, self.turns, self.policies, self.values)
+    print(data)
+    #data = np.array([len(self.states), self.states, self.turns, self.values], dtype=object)
+    # test = np.array([1, 2, 3.0])
+    # fpath = dataset_path + '/dataset_' + str(file_n) + '.npy'
+    # np.save(fpath, test)
     return 0
 
 def predict(values, states, turn, n_states):
@@ -93,8 +96,8 @@ def predict(values, states, turn, n_states):
 
 model = ResNet()
 trainer = MCTS_Trainer(model)
+trainer.play_matches(1)
 trainer.save_dataset()
-# trainer.play_matches(1)
 
 
 

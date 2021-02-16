@@ -8,6 +8,7 @@ using namespace std;
 
 struct IterationValue {
   int column;
+  double q_value;
   array<double, COLUMNS> q_values;
   array<int, COLUMNS> n_values;
   array<double, COLUMNS> policy;

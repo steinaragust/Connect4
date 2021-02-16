@@ -25,10 +25,12 @@ HashMapTree* MCTSAgent::get_tree() {
 
 TreeNodeLabel* MCTSAgent::set_root(Key &root_key, int turn) {
   TreeNodeLabel* root = _tree.set_root(root_key);
-  vector<Key> state;
-  state.push_back(root_key);
-  array<TreeNodeLabel*, COLUMNS> node_p = { root, NULL, NULL, NULL, NULL, NULL, NULL };
-  call_predict(state, node_p, turn);
+  if (use_NN_predict) {
+    vector<Key> state;
+    state.push_back(root_key);
+    array<TreeNodeLabel*, COLUMNS> node_p = { root, NULL, NULL, NULL, NULL, NULL, NULL };
+    call_predict(state, node_p, turn);
+  }
   return root;
 }
 
@@ -42,6 +44,7 @@ IterationValue MCTSAgent::get_return_value(TreeNodeLabel* root) {
   array<double, COLUMNS> q_values;
   array<int, COLUMNS> n_values;
   array<double, COLUMNS> policy;
+  double q_value = root->get_q();
   array<TreeNodeLabel*, COLUMNS> children = root->get_children();
   for (int i = 0; i < COLUMNS; i++) {
     if(children[i] != NULL) {
@@ -64,11 +67,12 @@ IterationValue MCTSAgent::get_return_value(TreeNodeLabel* root) {
       }
     }
   }
-  return {column, q_values, n_values, policy};
+  return {column, q_value, q_values, n_values, policy};
 }
 
 void MCTSAgent::print_iteration_value(IterationValue &value) {
   printf("Column: %d\n", value.column);
+  printf("q value: %.2f\n", value.q_value);
   printf("n values: ");
   for (int i = 0; i < COLUMNS; i++) {
     if (value.n_values[i] > numeric_limits<int>::min()) {

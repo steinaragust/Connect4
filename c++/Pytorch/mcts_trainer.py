@@ -6,6 +6,12 @@ from cppyy import ll
 from array import array
 from resnet import ResNet
 from utils import encode_for_predict
+from os import listdir
+from os.path import isfile, join
+import re
+#onlyfiles = [f for f in listdir(mypath) if isfile(join(mypath, f))]
+
+dataset_path = 'data/datasets'
 
 cppyy.include('../Connect4-Game/Game.cpp')
 cppyy.include('../MCTS/TreeNodeLabel.cpp')
@@ -18,17 +24,16 @@ from cppyy.gbl import Connect4
 
 class MCTS_Trainer:
   def __init__(self, model, simulations = 200):
-    self.turn = 0
     self.model = model
-    self.states = np.array([])
-    self.turns = np.array([])
-    self.policies = np.array([])
-    self.values = np.array([])
+    self.states = []
+    self.turns = []
+    self.policies = []
+    self.values = []
     self.agent_1 = MCTSAgent.MCTSAgent('AZ_Agent_0', simulations)
     self.agent_2 = MCTSAgent.MCTSAgent('AZ_Agent_1', simulations)
     self.score = {'AZ_Agent_0': 0, 'AZ_Agent_1': 0, 'Draw': 0}
-    self.agent_1.set_predict(prufa)
-    self.agent_2.set_predict(prufa)
+    # self.agent_1.set_predict(predict)
+    # self.agent_2.set_predict(predict)
 
   def predict(self, states, values, n_states):
     tensor_arr = tensor(states, dtype=torch.float)
@@ -47,14 +52,9 @@ class MCTS_Trainer:
             obj = player_1.play(game)
         else:
             obj = player_2.play(game)
-        print(array('f', obj.policy))
-        self.states = np.append(self.states, game.get_board())
-        self.turns = np.append(self.turns, turn)
-        self.policies = np.append(self.policies, list(array('f', obj.policy)))
-        print(self.policies)
-        # print(array('d', obj.n_values))
-        # print(array('d', obj.q_values))
-        # print(array('d', obj.policy))
+        self.states.append(game.get_board())
+        self.turns.append(turn)
+        self.policies.append(list(array('f', obj.policy)))
         game.drop_piece_in_column(obj.column)
     if game.winning_move():
         return player_1.get_name() if game.get_current_opponent_piece() == 0 else player_2.get_name()
@@ -67,10 +67,34 @@ class MCTS_Trainer:
       self.score[first] += 1
       self.score[second] += 1
 
-def prufa(values, states, turn, n_states):
+  def clear(self):
+    self.states = []
+    self.turns = []
+    self.policies = []
+    self.values = []
+
+  def save_dataset(self):
+    files = [f for f in listdir(dataset_path) if isfile(join(dataset_path, f))]
+    numbers = []
+    for f in files:
+      m = re.search('^dataset_(\d+)\.npy$', f)
+      numbers.append(int(m.group(1)))
+    file_n = max(numbers) + 1
+    test = np.array([1, 2, 3.0])
+    fpath = dataset_path + '/dataset_' + str(file_n) + '.npy'
+    np.save(fpath, test)
+    return 0
+
+def predict(values, states, turn, n_states):
   encoded = encode_for_predict(states, turn, n_states)
   trainer.predict(encoded, values, n_states)
 
+
+
 model = ResNet()
 trainer = MCTS_Trainer(model)
-trainer.play_matches(1)
+trainer.save_dataset()
+# trainer.play_matches(1)
+
+
+

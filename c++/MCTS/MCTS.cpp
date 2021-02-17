@@ -3,46 +3,41 @@ using namespace std;
 #include "../Connect4-Game/Game.h"
 #include "MCTSAgent.h"
 
-void expand(Connect4 &game, TreeNodeLabel* node,  MCTSAgent &agent) {
-  vector<Key> states;
-
+TreeNodeLabel* expand(Connect4 &game, Key &key, MCTSAgent &agent) {
   HashMapTree* tree = agent.get_tree();
+  TreeNodeLabel* node = tree->add_node(key);
+  vector<Key> states { key };
+  vector<TreeNodeLabel*> nodes { node };
 
-  int turn = game.get_to_move_opponent();
+  int turn = game.get_to_move();
+  agent.call_predict(states, nodes, turn);
 
-  // Add children
-  vector<int> valid_moves = game.get_valid_columns();
-  for (int m : valid_moves) {
-    game.drop_piece_in_column(m);
-    Key c_key = game.get_board();
-    TreeNodeLabel* c_node = tree->add_node(c_key);
-    node->add_child(c_node, m);
-    
-    states.push_back(c_key);
-    game.retract_piece_in_column(m);
-  }
-  if (agent.use_NN_predict) {
-    array<TreeNodeLabel*, COLUMNS> children = node->get_children();
-    agent.call_predict(states, children, turn);
-  }
-  node->set_is_expanded();
+  return node;
 }
 
-void select(Connect4 &game, TreeNodeLabel *parent, vector<int> &path, MCTSAgent &agent) {
+double select(Connect4 &game, TreeNodeLabel *parent, vector<int> &path, MCTSAgent &agent) {
   if (game.is_terminal_state()) {
-    return;
+    if (game.winning_move()) {
+      return 1;
+    }
+    return 0.5;
   }
   array<TreeNodeLabel*, COLUMNS> children = parent->get_children();
-  for (int i = 0; i < COLUMNS; i++) if (game.is_valid_column(i) && children[i]->get_expanded() == false) {
+  for (int i = 0; i < COLUMNS; i++) if (game.is_valid_column(i) && (children[i] == NULL || children[i]->get_n() == 0)) {
     game.drop_piece_in_column(i);
     path.push_back(i);
-    expand(game, children[i], agent);
-    return;
+    if (agent.use_NN_predict) {
+      Key child_key = game.get_board();
+      TreeNodeLabel* child = expand(game, child_key, agent);
+      parent->add_child(child, i);
+      return child->get_q();
+    }
+    return 0;
   }
   int best_child = parent->get_best_child(agent.use_NN_predict);
   game.drop_piece_in_column(best_child);
   path.push_back(best_child);
-  select(game, children[best_child], path, agent);
+  return select(game, children[best_child], path, agent);
 }
 
 double playout (Connect4 &game, vector<int> &path) {
@@ -86,7 +81,12 @@ void backup_simulation(Connect4 &game, HashMapTree* tree, vector<int> &path, dou
 void simulate(Connect4 &game, MCTSAgent &agent) {
   vector<int> path;
   HashMapTree* tree = agent.get_tree();
-  select(game, tree->get_root(), path, agent);
-  double value = playout(game, path);
+  double value = select(game, tree->get_root(), path, agent);
+  if (agent._iteration_nr == 199) {
+    game.print_board();
+  }
+  if (!agent.use_NN_predict) {
+    value = playout(game, path); 
+  }
   backup_simulation(game, tree, path, value);
 }

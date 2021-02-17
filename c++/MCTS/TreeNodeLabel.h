@@ -21,10 +21,9 @@ class TreeNodeLabel {
   // Functions
   int get_n();
   double get_q();
+  void set_q(double value);
   array<double, COLUMNS> get_p();
-  bool get_expanded();
   void set_p(double *value);
-  void set_is_expanded();
   void add_visit(TreeNodeLabel* child, int index, double value);
   void add_child(TreeNodeLabel* child, int index);
   array<TreeNodeLabel*, COLUMNS> get_children();
@@ -38,7 +37,6 @@ class TreeNodeLabel {
   int _n;
   double _q;
   array<double, COLUMNS> _p;
-  bool _expanded;
 };
 
 #endif // TREENODE_H

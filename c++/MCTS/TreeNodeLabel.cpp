@@ -4,14 +4,12 @@ TreeNodeLabel::TreeNodeLabel() {
   _n = 0;
   _q = 0; // Average q gildi, [1, -1, 1, 1, ...] / n
   for (int i =  0; i < COLUMNS; i++) _p[i] = 0;
-  _expanded = false;
   for (int i = 0; i < COLUMNS; i++) {
     _children[i] = NULL;
   }
 }
 
 TreeNodeLabel::~TreeNodeLabel() {
-
 }
 
 TreeNodeLabel::TreeNodeLabel(const TreeNodeLabel &copy) {}
@@ -24,20 +22,16 @@ double TreeNodeLabel::get_q() {
   return _q;
 }
 
+void TreeNodeLabel::set_q(double value) {
+  _q = value;
+}
+
 array<double, COLUMNS> TreeNodeLabel::get_p() {
   return _p;
 }
 
-bool TreeNodeLabel::get_expanded() {
-  return _expanded;
-}
-
 void TreeNodeLabel::set_p(double* value) {
   for (int i = 0; i < COLUMNS; i++) _p[i] = value[i];
-}
-
-void TreeNodeLabel::set_is_expanded() {
-  _expanded = true;
 }
 
 double TreeNodeLabel::UCT(int i) {

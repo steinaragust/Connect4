@@ -31,9 +31,10 @@ class MCTSAgent {
 
   // NN methods
   void set_predict(function<void(double**, int ***, int, int)> f);
-  void call_predict(vector<Key> &states, array<TreeNodeLabel*, COLUMNS> &nodes, int turn);
+  void call_predict(vector<Key> &states, vector<TreeNodeLabel*> &nodes, int turn);
 
   bool use_NN_predict;
+  int _iteration_nr;
 
   private:
   void fill_states(vector<Key> &states, int ***_states);

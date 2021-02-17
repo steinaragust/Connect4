@@ -28,8 +28,8 @@ class MCTS_Trainer:
     self.clear()
     self.agent_1 = MCTSAgent.MCTSAgent('AZ_Agent_0', simulations)
     self.agent_2 = MCTSAgent.MCTSAgent('AZ_Agent_1', simulations)
-    # self.agent_1.set_predict(predict)
-    # self.agent_2.set_predict(predict)
+    self.agent_1.set_predict(predict)
+    self.agent_2.set_predict(predict)
 
   def predict(self, states, values, n_states):
     tensor_arr = tensor(states, dtype=torch.float)
@@ -97,7 +97,7 @@ def predict(values, states, turn, n_states):
 model = ResNet()
 trainer = MCTS_Trainer(model)
 trainer.play_matches(1)
-trainer.save_dataset()
+# trainer.save_dataset()
 
 
 

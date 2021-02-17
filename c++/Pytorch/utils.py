@@ -5,8 +5,9 @@ from array import array
 def encode_for_training_1(states, turns, policies, values):
     states = encode_states(states, turns)
     policies =[list(x) for x in policies] 
-    values = list(values)
-    return np.array([states, np.array(policies), np.array(values)], dtype=object)
+    values = np.array(values)
+    policies = np.array(policies)
+    return np.concatenate([states, np.array(policies), values])
 
 
 def encode_states(samples, turns):

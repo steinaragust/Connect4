@@ -82,9 +82,9 @@ void simulate(Connect4 &game, MCTSAgent &agent) {
   vector<int> path;
   HashMapTree* tree = agent.get_tree();
   double value = select(game, tree->get_root(), path, agent);
-  if (agent._iteration_nr == 199) {
-    game.print_board();
-  }
+  // if (agent._iteration_nr == 199) {
+  //   game.print_board();
+  // }
   if (!agent.use_NN_predict) {
     value = playout(game, path); 
   }

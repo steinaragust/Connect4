@@ -2,7 +2,7 @@ from mcts_trainer import MCTS_Trainer
 from train import train_dataset
 from utils import encode_for_predict
 
-nr_generations = 10
+nr_generations = 3
 nr_matches = 100
 
 def predict(values, states, turn, n_states):

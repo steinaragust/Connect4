@@ -9,11 +9,11 @@ from torch.utils.data import DataLoader
 logs_path = 'data/logs'
 
 # constants
-# epochs = 40
-# milestones = [i * 10 for i in range(1,40)]
-epochs = 10
-milestones = [2, 5, 7]
-batch_size = 100
+epochs = 100
+milestones = [i * 10 for i in range(1,10)]
+# epochs = 10
+# milestones = [2, 5, 7]
+batch_size = 32
 learning_rate = 0.001
 max_norm = 1.0
 gradient_acc_step = 1

@@ -5,7 +5,6 @@ import torch.tensor as tensor
 from array import array
 from resnet import ResNet
 from utils import encode_for_predict, encode_for_training, decode_training_data
-from train import train_dataset
 from os import listdir
 from os.path import isfile, join
 import re

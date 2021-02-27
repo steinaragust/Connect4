@@ -28,6 +28,7 @@ class TreeNodeLabel {
   void add_child(TreeNodeLabel* child, int index);
   array<TreeNodeLabel*, COLUMNS> get_children();
   int get_best_child(bool use_PUCT);
+  bool first_best_child_call();
 
   private:
   double UCT(int i);

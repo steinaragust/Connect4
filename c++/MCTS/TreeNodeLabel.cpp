@@ -35,13 +35,13 @@ void TreeNodeLabel::set_p(double* value) {
 }
 
 double TreeNodeLabel::UCT(int i) {
-  if (_children[i]->_n == 0) return numeric_limits<double>::max();
-  return _children[i]->_q + C * (sqrt(log(_n) / _children[i]->_n));
+  if (_children[i]->get_n() == 0) return numeric_limits<double>::max();
+  return _children[i]->_q + C * (sqrt(log(_n) / _children[i]->get_n()));
 }
 
 double TreeNodeLabel::PUCT(int i) {
-  if (_children[i]->_n == 0) return numeric_limits<double>::max();
-  return _children[i]->_q + _p[i] * C * (sqrt(log(_n) / _children[i]->_n));
+  if (_children[i]->get_n() == 0) return numeric_limits<double>::max();
+  return _children[i]->get_q() + _p[i] * C * (sqrt(log(_n) / _children[i]->get_n()));
 }
 
 void TreeNodeLabel::add_visit(TreeNodeLabel* child, int index, double value) {
@@ -91,4 +91,11 @@ int TreeNodeLabel::get_best_child(bool use_PUCT) {
   // return index;
   
   return chosen_index(child_values, index);
+}
+
+bool TreeNodeLabel::first_best_child_call() {
+  for (int i = 0; i < COLUMNS; i++) {
+    if (_children[i] != NULL && _children[i]->get_n() != 1) return false;
+  }
+  return true;
 }

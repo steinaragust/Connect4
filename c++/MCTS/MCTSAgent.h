@@ -26,8 +26,10 @@ class MCTSAgent {
   HashMapTree* get_tree();
   TreeNodeLabel* set_root(Key &root_key, int turn);
   void reset();
+  IterationValue get_return_value(TreeNodeLabel* root, bool random_move);
   void print_iteration_value(IterationValue &value);
   IterationValue play(Connect4 game, bool random_move = false);
+  void can_win_now(Connect4 &game);
 
   // NN methods
   void set_predict(function<void(double**, int ***, int, int)> f);
@@ -35,12 +37,12 @@ class MCTSAgent {
 
   bool use_NN_predict;
   int _iteration_nr;
+  bool _can_win;
 
   private:
   void fill_states(vector<Key> &states, int ***_states);
   void free_states(int ***states, int length);
   function<void(double**, int ***, int, int)> _predict;
-  IterationValue get_return_value(TreeNodeLabel* root, bool random_move);
 
   string _name;
   int _iterations;

@@ -15,29 +15,11 @@ TreeNodeLabel* expand(Connect4 &game, Key &key, MCTSAgent &agent) {
   return node;
 }
 
-double select(Connect4 &game, TreeNodeLabel *parent, vector<int> &path, MCTSAgent &agent) {
-  if (game.is_terminal_state()) {
-    if (game.winning_move()) {
-      return 1;
-    }
-    return 0.5;
+double game_final_score(Connect4 &game) {
+  if (game.winning_move()) {
+    return 1;
   }
-  array<TreeNodeLabel*, COLUMNS> children = parent->get_children();
-  for (int i = 0; i < COLUMNS; i++) if (game.is_valid_column(i) && (children[i] == NULL || children[i]->get_n() == 0)) {
-    game.drop_piece_in_column(i);
-    path.push_back(i);
-    if (agent.use_NN_predict) {
-      Key child_key = game.get_board();
-      TreeNodeLabel* child = expand(game, child_key, agent);
-      parent->add_child(child, i);
-      return child->get_q();
-    }
-    return 0;
-  }
-  int best_child = parent->get_best_child(agent.use_NN_predict);
-  game.drop_piece_in_column(best_child);
-  path.push_back(best_child);
-  return select(game, children[best_child], path, agent);
+  return 0.5;
 }
 
 double playout (Connect4 &game, vector<int> &path) {
@@ -48,10 +30,32 @@ double playout (Connect4 &game, vector<int> &path) {
     game.drop_piece_in_column(moves[random_move]);
     path.push_back(moves[random_move]);
   }
-  if (game.winning_move()) {
-    return 1;
+  return game_final_score(game);
+}
+
+double traverse(Connect4 &game, TreeNodeLabel *parent, vector<int> &path, MCTSAgent &agent) {
+  array<TreeNodeLabel*, COLUMNS> children = parent->get_children();
+  for (int i = 0; i < COLUMNS; i++) if (game.is_valid_column(i) && (children[i] == NULL || children[i]->get_n() == 0)) {
+    game.drop_piece_in_column(i);
+    path.push_back(i);
+    if (agent.use_NN_predict) {
+      Key child_key = game.get_board();
+      TreeNodeLabel* child = expand(game, child_key, agent);
+      parent->add_child(child, i);
+      return game.is_terminal_state() ? game_final_score(game) : child->get_q();
+    } else {
+      return playout(game, path);
+    }
   }
-  return 0.5;
+  int best_child = parent->get_best_child(agent.use_NN_predict);
+  // if (agent._can_win && parent == agent.get_tree()->get_root() && parent->first_best_child_call()) {
+  //   printf("best_child: %d\n", best_child);
+  //   IterationValue info = agent.get_return_value(parent, false);
+  //   agent.print_iteration_value(info);
+  // }
+  game.drop_piece_in_column(best_child);
+  path.push_back(best_child);
+  return game.is_terminal_state() ? game_final_score(game) : traverse(game, children[best_child], path, agent);
 }
 
 void backup_value(HashMapTree* tree, Key &key, TreeNodeLabel* &parent, TreeNodeLabel* child, int column, double value) {
@@ -81,12 +85,6 @@ void backup_simulation(Connect4 &game, HashMapTree* tree, vector<int> &path, dou
 void simulate(Connect4 &game, MCTSAgent &agent) {
   vector<int> path;
   HashMapTree* tree = agent.get_tree();
-  double value = select(game, tree->get_root(), path, agent);
-  // if (agent._iteration_nr == 199) {
-  //   game.print_board();
-  // }
-  if (!agent.use_NN_predict) {
-    value = playout(game, path); 
-  }
+  double value = traverse(game, tree->get_root(), path, agent);
   backup_simulation(game, tree, path, value);
 }

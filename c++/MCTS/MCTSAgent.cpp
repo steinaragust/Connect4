@@ -11,6 +11,7 @@ MCTSAgent::MCTSAgent(string name, int iterations, function<void(double**, int **
   _iteration_nr = 0;
   _predict = NN_predict;
   use_NN_predict = NN_predict != nullptr;
+  _can_win = false;
 }
 
 MCTSAgent::~MCTSAgent() {
@@ -114,7 +115,21 @@ void MCTSAgent::print_iteration_value(IterationValue &value) {
       printf("NULL ");
     }
   }
-  printf("\n");
+  printf("\n\n");
+}
+
+void MCTSAgent::can_win_now(Connect4 &game) {
+  vector<int> moves = game.get_valid_columns();
+  for (int m : moves) {
+    game.drop_piece_in_column(m);
+    bool winning_move = game.winning_move();
+    game.retract_piece_in_column(m);
+    if (winning_move) {
+      _can_win = true;
+      return;
+    }
+  }
+  _can_win = false;
 }
 
 IterationValue MCTSAgent::play(Connect4 game, bool random_move) {
@@ -122,12 +137,16 @@ IterationValue MCTSAgent::play(Connect4 game, bool random_move) {
   Key root_key = game.get_board();
   int turn = game.get_to_move();
   TreeNodeLabel* root_node = set_root(root_key, turn);
-  // printf("start \n");
+  // can_win_now(game);
   for ( ;_iteration_nr < _iterations; _iteration_nr += 1) {
     simulate(game, *this);
   }
   IterationValue return_value = get_return_value(root_node, random_move);
-  // print_iteration_value(return_value);
+  // if (_can_win) {
+  //   printf("Turn: %d\n", turn);
+  //   print_iteration_value(return_value);
+  //   game.print_board();
+  // }
   
   return return_value;
 }

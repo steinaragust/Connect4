@@ -4,7 +4,7 @@ import torch
 import torch.tensor as tensor
 from array import array
 from resnet import ResNet
-from utils import encode_for_predict, encode_for_training, decode_training_data
+from utils import encode_for_training, decode_training_data
 from os import listdir
 from os.path import isfile, join
 import re
@@ -21,12 +21,8 @@ cppyy.include('../MCTS/MCTS.cpp')
 from cppyy.gbl import MCTSAgent
 from cppyy.gbl import Connect4
 
-def predict(values, states, turn, n_states):
-  encoded = encode_for_predict(states, turn, n_states)
-  trainer.predict(encoded, values, n_states)
-
 class MCTS_Trainer:
-  def __init__(self, predictPtr = predict, simulations = 200):
+  def __init__(self, predictPtr, simulations = 200):
     self.model = ResNet()
     self.next_generation(True)
     # self.agent_1 = MCTSAgent.MCTSAgent('AZ_Agent_0', simulations)
@@ -130,10 +126,3 @@ class MCTS_Trainer:
   def get_training_set(self):
     return encode_for_training(self.states, self.turns, self.policies, self.values)
 
-trainer = MCTS_Trainer()
-# trainer.play_matches(1)
-# data = trainer.get_training_set()
-# train_dataset(data, trainer.model, trainer.generation)
-# trainer.save_latest_dataset()
-# trainer.save_latest_model()
-# trainer.next_generation()

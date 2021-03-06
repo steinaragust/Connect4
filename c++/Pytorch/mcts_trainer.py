@@ -87,7 +87,8 @@ class MCTS_Trainer:
 
   def predict(self, states, values, n_states):
     tensor_arr = tensor(states, dtype=torch.float)
-    policy_pred, value_pred = self.model(tensor_arr)
+    with torch.no_grad():
+      policy_pred, value_pred = self.model(tensor_arr)
     for i in range(n_states):
       for j in range(0, 7):
         values[i][j] = policy_pred[i][j].item()
@@ -100,9 +101,9 @@ class MCTS_Trainer:
         turn = game.get_to_move()
         obj = None
         if (turn == game.PLAYER_1):
-            obj = player_1.play(game, moves < 4)
+            obj = player_1.play(game, moves < 6)
         else:
-            obj = player_2.play(game, moves < 4)
+            obj = player_2.play(game, moves < 6)
         moves += 1
         self.states.append(game.get_board())
         self.turns.append(turn)
@@ -110,7 +111,7 @@ class MCTS_Trainer:
         self.values.append(obj.q_value)
         game.drop_piece_in_column(obj.column)
     if game.winning_move():
-        return player_1.get_name() if game.get_current_opponent_piece() == 0 else player_2.get_name()
+        return player_1.get_name() if game.get_to_move_opponent() == 0 else player_2.get_name()
     return 'Draw'
   
   def play_matches(self, n_matches = 100):

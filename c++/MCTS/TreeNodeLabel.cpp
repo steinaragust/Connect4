@@ -36,7 +36,7 @@ void TreeNodeLabel::set_p(double* value) {
 
 double TreeNodeLabel::UCT(int i) {
   if (_children[i]->get_n() == 0) return numeric_limits<double>::max();
-  return _children[i]->_q + C * (sqrt(log(_n) / _children[i]->get_n()));
+  return _children[i]->get_q() + C * (sqrt(log(_n) / _children[i]->get_n()));
 }
 
 double TreeNodeLabel::PUCT(int i) {

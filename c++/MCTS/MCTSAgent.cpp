@@ -142,6 +142,7 @@ IterationValue MCTSAgent::play(Connect4 game, bool random_move) {
     simulate(game, *this);
   }
   IterationValue return_value = get_return_value(root_node, random_move);
+  print_iteration_value(return_value);
   // if (_can_win) {
   //   printf("Turn: %d\n", turn);
   //   print_iteration_value(return_value);

@@ -77,23 +77,26 @@ class MCTS_Evaluator:
         obj = player_2.play(game, False)
       game.drop_piece_in_column(obj.column)
       game.print_board()
+      print('\n\n')
       # print(list(array('f', obj.policy)))
       # print(obj.column)
       # print('\n\n')
       move += 1
+    #game.print_board()
     if game.winning_move():
       winner = player_1.get_name() if game.get_to_move_opponent() == 0 else player_2.get_name()
-      # print('winner is: %s\n\n' % (winner))
       return winner
     return 'Draw'
 
   def reset(self):
     self.score = {self.agent_1_name: 0, self.agent_2_name: 0, 'Draw': 0}
 
-  def play_matches(self, n_matches = 100):
+  def play_matches_cpu(self, n_matches = 100):
     for _ in range(n_matches):
       first = self.play_a_game(self.agent_1, self.agent_2)
+      print('winner is: %s\n\n' % (first))
       second = self.play_a_game(self.agent_2, self.agent_1)
+      print('winner is: %s\n\n' % (second))
       self.score[first] += 1
       self.score[second] += 1
       print(self.score)
@@ -103,6 +106,6 @@ def predict(values, states, turn, n_states):
   encoded = encode_for_predict(states, turn, n_states)
   evaluator.predict(encoded, values, n_states)
 
-evaluator = MCTS_Evaluator(predict, 0, 8)
+evaluator = MCTS_Evaluator(predict, 0, 9)
 
-score = evaluator.play_matches(1)
+score = evaluator.play_matches_cpu(1)

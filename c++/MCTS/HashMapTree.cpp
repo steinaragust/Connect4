@@ -61,3 +61,8 @@ void HashMapTree::print_map_size() {
   }
   printf("Size of map: %d\n", size);
 }
+
+bool HashMapTree::is_equal(Key &key1, Key &key2) {
+  unordered_map<Key, TreeNodeLabel*, Hasher, EqualFn>::key_equal fn = _node_labels.key_eq();
+  return fn(key1, key2);
+}

@@ -57,6 +57,7 @@ class MCTS_Trainer:
       model_n = self.generation - 1
     fpath = model_path + '/model_' + str(model_n) + '.pt'
     self.model.load_state_dict(torch.load(fpath))
+    self.model.eval()
     return True
 
   # Saves the latest, newly trained model
@@ -101,9 +102,9 @@ class MCTS_Trainer:
         turn = game.get_to_move()
         obj = None
         if (turn == game.PLAYER_1):
-            obj = player_1.play(game, moves < 6)
+            obj = player_1.play(game, moves < 4)
         else:
-            obj = player_2.play(game, moves < 6)
+            obj = player_2.play(game, moves < 4)
         moves += 1
         self.states.append(game.get_board())
         self.turns.append(turn)

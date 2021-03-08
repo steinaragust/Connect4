@@ -42,6 +42,11 @@ double traverse(Connect4 &game, TreeNodeLabel *parent, vector<int> &path, MCTSAg
       Key child_key = game.get_board();
       TreeNodeLabel* child = expand(game, child_key, agent);
       parent->add_child(child, i);
+      // if (game.is_terminal_state() && agent._nr_moves_so_far == 13) {
+      //   printf("Terminal state:\n");
+      //   game.print_board();
+      //   printf("\n\n");
+      // }
       return game.is_terminal_state() ? game_final_score(game) : child->get_q();
     } else {
       return playout(game, path);
@@ -49,7 +54,9 @@ double traverse(Connect4 &game, TreeNodeLabel *parent, vector<int> &path, MCTSAg
   }
   int best_child = parent->get_best_child(agent.use_NN_predict);
   // if (agent._can_win && parent == agent.get_tree()->get_root() && parent->first_best_child_call()) {
+  // if (parent == agent.get_tree()->get_root() && parent->first_best_child_call()) {
   //   printf("best_child: %d\n", best_child);
+  //   Key board = game.get_board();
   //   IterationValue info = agent.get_return_value(parent, false);
   //   agent.print_iteration_value(info);
   // }

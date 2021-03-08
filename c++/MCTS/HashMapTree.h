@@ -19,7 +19,7 @@ static array<array<int, 2>, ROWS * COLUMNS> intialize() {
   srand(time(0));
   array<array<int, 2>, ROWS * COLUMNS> arr;
   for (int i = 0; i < ROWS * COLUMNS; i++) {
-    for (int j = 0; i < 2; i++) {
+    for (int j = 0; j < 2; j++) {
       arr[i][j] = rand();
     }
   }
@@ -67,6 +67,7 @@ class HashMapTree {
   TreeNodeLabel* get_root();
   TreeNodeLabel* get_node_label(Key &key);
   TreeNodeLabel* add_node(Key &key);
+  bool is_equal(Key &key1, Key &key2);
   void clear_map();
   void print_map_size();
 

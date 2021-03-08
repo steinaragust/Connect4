@@ -137,6 +137,7 @@ IterationValue MCTSAgent::play(Connect4 game, bool random_move) {
   Key root_key = game.get_board();
   int turn = game.get_to_move();
   TreeNodeLabel* root_node = set_root(root_key, turn);
+  _nr_moves_so_far = game.get_move_no();
   // can_win_now(game);
   for ( ;_iteration_nr < _iterations; _iteration_nr += 1) {
     simulate(game, *this);
@@ -193,6 +194,14 @@ void MCTSAgent::call_predict(vector<Key> &states, vector<TreeNodeLabel*> &nodes,
 
   fill_states(states, _states);
   _predict(values, _states, turn, states.size());
+
+  // if (nodes[0] == _tree.get_root()) {
+  //   printf("values from predict: \n");
+  //   for (int i = 0; i < COLUMNS; i++) {
+  //     printf("%lf ", values[0][i]);
+  //   }
+  //   printf("\n\n");
+  // }
 
   for (int i = 0; i < states.size(); i++) {
     nodes[i]->set_p(values[i]);

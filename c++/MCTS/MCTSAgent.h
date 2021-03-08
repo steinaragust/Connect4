@@ -38,6 +38,7 @@ class MCTSAgent {
   bool use_NN_predict;
   int _iteration_nr;
   bool _can_win;
+  int _nr_moves_so_far;
 
   private:
   void fill_states(vector<Key> &states, int ***_states);

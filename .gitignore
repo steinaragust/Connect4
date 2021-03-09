@@ -180,4 +180,6 @@ dmypy.json
 # profiling data
 .prof
 
+/c++/Pytorch/*.gz
+
 # End of https://www.toptal.com/developers/gitignore/api/c++,python

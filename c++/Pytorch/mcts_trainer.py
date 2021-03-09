@@ -127,4 +127,3 @@ class MCTS_Trainer:
   
   def get_training_set(self):
     return encode_for_training(self.states, self.turns, self.policies, self.values)
-

@@ -6,11 +6,11 @@ def predict(values, states, turn, n_states):
   encoded = encode_for_predict(states, turn, n_states)
   trainer.predict(encoded, values, n_states)
 
-trainer = MCTS_Trainer(predict, 600)
+trainer = MCTS_Trainer(predict)
 
 def train(nr_generations, nr_matches):
   start_generation = trainer.generation
-  for g in range(start_generation, nr_generations):
+  for g in range(start_generation, start_generation + nr_generations):
     # One iteration
     print('Generation %d starting' % (g))
     trainer.play_matches(nr_matches)
@@ -20,4 +20,4 @@ def train(nr_generations, nr_matches):
     trainer.save_latest_model()
     trainer.next_generation()
 
-train(11, 100)
+train(5, 100)

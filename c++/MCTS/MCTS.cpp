@@ -106,10 +106,8 @@ double traverse(Connect4 &game, TreeNodeLabel *parent, vector<int> &path, MCTSAg
   return game.is_terminal_state() ? game_final_score(game) : traverse(game, nodes[best_child], path, agent);
 }
 
-void backup_value(HashMapTree* tree, Key &key, TreeNodeLabel* &node, double value) {
-  if (node == NULL) {
-    node = tree->add_node(key);
-  }
+void backup_value(HashMapTree* tree, Key &key, double value) {
+  TreeNodeLabel* node = tree->add_node(key);
   node->add_visit(value);
 }
 
@@ -117,13 +115,11 @@ void backup_simulation(Connect4 &game, HashMapTree* tree, vector<int> &path, dou
   for (vector<int>::reverse_iterator i = path.rbegin(); i != path.rend(); ++i ) { 
     Key key = game.get_board();
     game.retract_piece_in_column(*i);
-    TreeNodeLabel* node = tree->get_node_label(key);
-    backup_value(tree, key, node, value);
+    backup_value(tree, key, value);
     value = -value;
   }
   Key key = game.get_board();
-  TreeNodeLabel* node = tree->get_node_label(key);
-  backup_value(tree, key, node, value);
+  backup_value(tree, key, value);
 }
 
 void simulate(Connect4 &game, MCTSAgent &agent) {

@@ -25,14 +25,17 @@ HashMapTree* MCTSAgent::get_tree() {
   return &_tree;
 }
 
-TreeNodeLabel* MCTSAgent::set_root(Key &root_key, int turn) {
+void MCTSAgent::set_root(Connect4 &game) {
+  Key root_key = game.get_board();
   TreeNodeLabel* root = _tree.set_root(root_key);
   if (use_NN_predict) {
+    int turn = game.get_to_move();
     vector<Key> states { root_key };
     vector<TreeNodeLabel*> nodes { root };
     call_predict(states, nodes, turn);
+    root->print_p();
+    printf("\n\n");
   }
-  return root;
 }
 
 void MCTSAgent::reset() {
@@ -40,15 +43,26 @@ void MCTSAgent::reset() {
   _tree.clear_map();
 }
 
-IterationValue MCTSAgent::get_return_value(TreeNodeLabel* root, bool random_move) {
+IterationValue MCTSAgent::get_return_value(Connect4 &game, bool random_move) {
   int total = 0;
   int column = -1;
   int available_moves = 0;
   array<double, COLUMNS> q_values;
   array<int, COLUMNS> n_values;
   array<double, COLUMNS> policy;
-  double q_value = root->get_q();
-  array<TreeNodeLabel*, COLUMNS> children = root->get_children();
+  double q_value = _tree.get_root()->get_q();
+  array<TreeNodeLabel*, COLUMNS> children;
+  vector<int> moves = game.get_valid_columns();
+  for (int i = 0; i < COLUMNS; i++) children[i] = NULL;
+
+  for (int m : moves) {
+    game.drop_piece_in_column(m);
+    Key key = game.get_board();
+    children[m] = _tree.get_node_label(key);
+    game.retract_piece_in_column(m);
+  }
+
+
   for (int i = 0; i < COLUMNS; i++) {
     if(children[i] != NULL) {
       available_moves += 1;
@@ -61,6 +75,7 @@ IterationValue MCTSAgent::get_return_value(TreeNodeLabel* root, bool random_move
       policy[i] = 0.0;
     }
   }
+
   int max_visits = numeric_limits<int>::min();
   for (int i = 0; i < COLUMNS; i++) {
     if (children[i] != NULL) {
@@ -71,6 +86,7 @@ IterationValue MCTSAgent::get_return_value(TreeNodeLabel* root, bool random_move
       }
     }
   }
+
   if (random_move) {
     int chosen = rand() % available_moves;
     for (int i = 0; i < COLUMNS; i++) {
@@ -134,21 +150,13 @@ void MCTSAgent::can_win_now(Connect4 &game) {
 
 IterationValue MCTSAgent::play(Connect4 game, bool random_move) {
   reset();
-  Key root_key = game.get_board();
-  int turn = game.get_to_move();
-  TreeNodeLabel* root_node = set_root(root_key, turn);
+  set_root(game);
   _nr_moves_so_far = game.get_move_no();
-  // can_win_now(game);
   for ( ;_iteration_nr < _iterations; _iteration_nr += 1) {
     simulate(game, *this);
   }
-  IterationValue return_value = get_return_value(root_node, random_move);
+  IterationValue return_value = get_return_value(game, random_move);
   print_iteration_value(return_value);
-  // if (_can_win) {
-  //   printf("Turn: %d\n", turn);
-  //   print_iteration_value(return_value);
-  //   game.print_board();
-  // }
   
   return return_value;
 }
@@ -194,14 +202,6 @@ void MCTSAgent::call_predict(vector<Key> &states, vector<TreeNodeLabel*> &nodes,
 
   fill_states(states, _states);
   _predict(values, _states, turn, states.size());
-
-  // if (nodes[0] == _tree.get_root()) {
-  //   printf("values from predict: \n");
-  //   for (int i = 0; i < COLUMNS; i++) {
-  //     printf("%lf ", values[0][i]);
-  //   }
-  //   printf("\n\n");
-  // }
 
   for (int i = 0; i < states.size(); i++) {
     nodes[i]->set_p(values[i]);

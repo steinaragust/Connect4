@@ -66,3 +66,8 @@ bool HashMapTree::is_equal(Key &key1, Key &key2) {
   unordered_map<Key, TreeNodeLabel*, Hasher, EqualFn>::key_equal fn = _node_labels.key_eq();
   return fn(key1, key2);
 }
+
+size_t HashMapTree::hash_code(Key &key) {
+  unordered_map<Key, TreeNodeLabel*, Hasher, EqualFn>::hasher fn = _node_labels.hash_function();
+  return fn(key);
+}

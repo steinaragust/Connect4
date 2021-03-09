@@ -3,6 +3,8 @@ using namespace std;
 #include "../Connect4-Game/Game.h"
 #include "MCTSAgent.h"
 
+const double C = 0.2;
+
 TreeNodeLabel* expand(Connect4 &game, Key &key, MCTSAgent &agent) {
   HashMapTree* tree = agent.get_tree();
   TreeNodeLabel* node = tree->add_node(key);
@@ -33,60 +35,95 @@ double playout (Connect4 &game, vector<int> &path) {
   return game_final_score(game);
 }
 
-double traverse(Connect4 &game, TreeNodeLabel *parent, vector<int> &path, MCTSAgent &agent) {
-  array<TreeNodeLabel*, COLUMNS> children = parent->get_children();
-  for (int i = 0; i < COLUMNS; i++) if (game.is_valid_column(i) && (children[i] == NULL || children[i]->get_n() == 0)) {
-    game.drop_piece_in_column(i);
-    path.push_back(i);
-    if (agent.use_NN_predict) {
-      Key child_key = game.get_board();
-      TreeNodeLabel* child = expand(game, child_key, agent);
-      parent->add_child(child, i);
-      // if (game.is_terminal_state() && agent._nr_moves_so_far == 13) {
-      //   printf("Terminal state:\n");
-      //   game.print_board();
-      //   printf("\n\n");
-      // }
-      return game.is_terminal_state() ? game_final_score(game) : child->get_q();
-    } else {
-      return playout(game, path);
-    }
-  }
-  int best_child = parent->get_best_child(agent.use_NN_predict);
-  // if (agent._can_win && parent == agent.get_tree()->get_root() && parent->first_best_child_call()) {
-  // if (parent == agent.get_tree()->get_root() && parent->first_best_child_call()) {
-  //   printf("best_child: %d\n", best_child);
-  //   Key board = game.get_board();
-  //   IterationValue info = agent.get_return_value(parent, false);
-  //   agent.print_iteration_value(info);
-  // }
-  game.drop_piece_in_column(best_child);
-  path.push_back(best_child);
-  return game.is_terminal_state() ? game_final_score(game) : traverse(game, children[best_child], path, agent);
+double UCT(TreeNodeLabel* parent, TreeNodeLabel* child, int index) {
+  if (child->get_n() == 0) return numeric_limits<double>::max();
+  return child->get_q() + C * (sqrt(log(parent->get_n()) / child->get_n()));
 }
 
-void backup_value(HashMapTree* tree, Key &key, TreeNodeLabel* &parent, TreeNodeLabel* child, int column, double value) {
-  if (parent == NULL) {
-    parent = tree->add_node(key);
+double PUCT(TreeNodeLabel* parent, TreeNodeLabel* child, int index) {
+  if (child->get_n() == 0) return numeric_limits<double>::max();
+  return child->get_q() + child->get_p()[index] * C * (sqrt(log(parent->get_n()) / child->get_n()));
+}
+
+// Choose random child when there are more than one best child
+int choose_index(double (&values)[COLUMNS], int best_value_index) {
+  vector<int> available_columns;
+  for (int i = 0; i < COLUMNS; i++) {
+    if (values[i] >= values[best_value_index]) {
+      available_columns.push_back(i);
+    }
   }
-  parent->add_visit(child, column, value);
+  int random_move = rand() % available_columns.size();
+  return available_columns[random_move];
+}
+
+int select_best_child(TreeNodeLabel* parent, TreeNodeLabel* (&children)[COLUMNS], bool use_PUCT) {
+  double best_child_value = numeric_limits<double>::lowest();
+  double child_values[COLUMNS];
+  int index = -1;
+
+  for (int i = 0; i < COLUMNS; i++) {
+    if (children[i] == NULL) {
+      child_values[i] = numeric_limits<double>::lowest();
+      continue;
+    }
+    double child_value = use_PUCT ? PUCT(parent, children[i], i) : UCT(parent, children[i], i);
+    child_values[i] = child_value;
+    if (child_value > best_child_value) {
+      best_child_value = child_value;
+      index = i;
+    }
+  }
+  
+  return choose_index(child_values, index);
+}
+
+double traverse(Connect4 &game, TreeNodeLabel *parent, vector<int> &path, MCTSAgent &agent) {
+  HashMapTree* tree = agent.get_tree();
+  TreeNodeLabel* nodes[COLUMNS];
+  for (int i = 0; i < COLUMNS; i++) nodes[i] = NULL;
+
+  vector<int> available_moves = game.get_valid_columns();
+
+  for (int m : available_moves) {
+    game.drop_piece_in_column(m);
+    Key child_key = game.get_board();
+    TreeNodeLabel* child_node = tree->get_node_label(child_key);
+    if (child_node == NULL || child_node->get_n() == 0) {
+      path.push_back(m);
+      if (agent.use_NN_predict) {
+        child_node = expand(game, child_key, agent);
+        return game.is_terminal_state() ? game_final_score(game) : child_node->get_q();
+      }
+      return playout(game, path);
+    }
+    game.retract_piece_in_column(m);
+    nodes[m] = child_node;
+  }
+  int best_child = select_best_child(parent, nodes, agent.use_NN_predict);
+  game.drop_piece_in_column(best_child);
+  path.push_back(best_child);
+  return game.is_terminal_state() ? game_final_score(game) : traverse(game, nodes[best_child], path, agent);
+}
+
+void backup_value(HashMapTree* tree, Key &key, TreeNodeLabel* &node, double value) {
+  if (node == NULL) {
+    node = tree->add_node(key);
+  }
+  node->add_visit(value);
 }
 
 void backup_simulation(Connect4 &game, HashMapTree* tree, vector<int> &path, double value) {
-  int move = -1;
-  TreeNodeLabel* child = NULL;
   for (vector<int>::reverse_iterator i = path.rbegin(); i != path.rend(); ++i ) { 
     Key key = game.get_board();
     game.retract_piece_in_column(*i);
-    TreeNodeLabel* parent = tree->get_node_label(key);
-    backup_value(tree, key, parent, child, move, value);
+    TreeNodeLabel* node = tree->get_node_label(key);
+    backup_value(tree, key, node, value);
     value = -value;
-    move = *i;
-    child = parent;
   }
   Key key = game.get_board();
-  TreeNodeLabel* parent = tree->get_node_label(key);
-  backup_value(tree, key, parent, child, move, value);
+  TreeNodeLabel* node = tree->get_node_label(key);
+  backup_value(tree, key, node, value);
 }
 
 void simulate(Connect4 &game, MCTSAgent &agent) {

@@ -7,6 +7,10 @@ using namespace std;
 #include "printf.h"
 #include "string"
 
+
+const int ROWS = 6;
+const int COLUMNS = 7;
+
 class Connect4
 {
 public:
@@ -40,8 +44,6 @@ public:
   const int PLAYER_1_PIECE = 1;
   const int PLAYER_2_PIECE = 2;
   const int PIECE_PLAYER[2] = {PLAYER_1_PIECE, PLAYER_2_PIECE};
-  const int ROWS = 6;
-  const int COLUMNS = 7;
   const int WINDOW = 4;
 
   // Class variables

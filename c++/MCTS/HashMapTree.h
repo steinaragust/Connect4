@@ -68,6 +68,7 @@ class HashMapTree {
   TreeNodeLabel* get_node_label(Key &key);
   TreeNodeLabel* add_node(Key &key);
   bool is_equal(Key &key1, Key &key2);
+  size_t hash_code(Key &key);
   void clear_map();
   void print_map_size();
 

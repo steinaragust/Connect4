@@ -61,28 +61,26 @@ class MCTS_Evaluator:
 
   def play_a_game(self, player_1, player_2):
     game = Connect4.Connect4()
-    # print('player: 1 is: %s' % (player_1.get_name()))
-    # print('player: 2 is: %s' % (player_2.get_name()))
+    print('player: 1 is: %s' % (player_1.get_name()))
+    print('player: 2 is: %s\n' % (player_2.get_name()))
     move = 0
     while(not game.is_terminal_state()):
       self.turn = game.get_to_move()
       obj = None
+      random_move = False
+      print('move nr: %d' % (move))
       if (self.turn == game.PLAYER_1):
         self.agent_turn = 0 if player_1.get_name() == self.agent_1_name else 1
         print('player 1 turn')
-        obj = player_1.play(game, False)
+        obj = player_1.play(game, random_move)
       else:
         self.agent_turn = 0 if player_2.get_name() == self.agent_1_name else 1
         print('player 2 turn')
-        obj = player_2.play(game, False)
+        obj = player_2.play(game, random_move)
       game.drop_piece_in_column(obj.column)
       game.print_board()
       print('\n\n')
-      # print(list(array('f', obj.policy)))
-      # print(obj.column)
-      # print('\n\n')
       move += 1
-    #game.print_board()
     if game.winning_move():
       winner = player_1.get_name() if game.get_to_move_opponent() == 0 else player_2.get_name()
       return winner
@@ -106,6 +104,6 @@ def predict(values, states, turn, n_states):
   encoded = encode_for_predict(states, turn, n_states)
   evaluator.predict(encoded, values, n_states)
 
-evaluator = MCTS_Evaluator(predict, 0, 9)
+evaluator = MCTS_Evaluator(predict, 0, 10)
 
 score = evaluator.play_matches_cpu(1)

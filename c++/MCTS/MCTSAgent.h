@@ -24,9 +24,9 @@ class MCTSAgent {
   // Public methods
   string get_name();
   HashMapTree* get_tree();
-  TreeNodeLabel* set_root(Key &root_key, int turn);
+  void set_root(Connect4 &game);
   void reset();
-  IterationValue get_return_value(TreeNodeLabel* root, bool random_move);
+  IterationValue get_return_value(Connect4 &game, bool random_move);
   void print_iteration_value(IterationValue &value);
   IterationValue play(Connect4 game, bool random_move = false);
   void can_win_now(Connect4 &game);
@@ -39,6 +39,7 @@ class MCTSAgent {
   int _iteration_nr;
   bool _can_win;
   int _nr_moves_so_far;
+  size_t root_hash_key;
 
   private:
   void fill_states(vector<Key> &states, int ***_states);

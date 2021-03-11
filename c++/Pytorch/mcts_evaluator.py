@@ -78,6 +78,8 @@ class MCTS_Evaluator:
         print('player 2 turn')
         obj = player_2.play(game, random_move)
       game.drop_piece_in_column(obj.column)
+      print(list(array('f', obj.policy)))
+      print(obj.column)
       game.print_board()
       print('\n\n')
       move += 1
@@ -104,6 +106,6 @@ def predict(values, states, turn, n_states):
   encoded = encode_for_predict(states, turn, n_states)
   evaluator.predict(encoded, values, n_states)
 
-evaluator = MCTS_Evaluator(predict, 0, 10)
+evaluator = MCTS_Evaluator(predict, 0, 2)
 
 score = evaluator.play_matches_cpu(1)

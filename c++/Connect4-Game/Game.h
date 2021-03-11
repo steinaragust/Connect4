@@ -87,7 +87,6 @@ public:
   }
 
 private:
-  void create_board();
   int get_next_open_row(int column);
   void set_piece(int row, int column, int piece);
 };

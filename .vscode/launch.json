@@ -15,6 +15,18 @@
       "environment": [],
       "externalConsole": false,
       "MIMode": "lldb"
+    },
+    {
+      "name": "Boardgame",
+      "type": "cppdbg",
+      "request": "launch",
+      "program": "${workspaceFolder}/c++/BoardGame/a.out",
+      "args": [],
+      "stopAtEntry": false,
+      "cwd": "${workspaceFolder}/c++/BoardGame",
+      "environment": [],
+      "externalConsole": false,
+      "MIMode": "lldb"
     }
   ]
 }

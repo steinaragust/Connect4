@@ -33,6 +33,7 @@ void MCTSAgent::set_root(Connect4 &game) {
     vector<Key> states { root_key };
     vector<TreeNodeLabel*> nodes { root };
     call_predict(states, nodes, turn);
+    root->print_p();
   }
 }
 

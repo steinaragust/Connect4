@@ -6,6 +6,5 @@ void profa(BoardGame &game) {
 
 int main() {
   BoardGame *game = new Connect4();
-  profa(*game);
   return 0;
 }

@@ -14,23 +14,30 @@ using namespace std;
 class Hasher
 {
 private:
-static int ROWS;
-static int COLUMNS;
+inline static int NR_UNIQUE_PCS;
+inline static int ROWS;
+inline static int COLUMNS;
 // thread local for threads
-static int (*zobrist)[2];
+inline static int **zobrist;
 public:
-  static void initialize(int _rows, int _columns) {
+  ~Hasher() {
+    clear();
+  };
+  static void initialize(int _rows, int _columns, int _nr_unique_pcs) {
+    NR_UNIQUE_PCS = _nr_unique_pcs;
     ROWS = _rows;
     COLUMNS = _rows;
     srand(time(0));
-    zobrist = new int[ROWS * COLUMNS][2];
+    zobrist = new int*[ROWS * COLUMNS];
     for (int i = 0; i < ROWS * COLUMNS; i++) {
-      for (int j = 0; j < 2; j++) {
+      zobrist[i] = new int[NR_UNIQUE_PCS];
+      for (int j = 0; j < NR_UNIQUE_PCS; j++) {
         zobrist[i][j] = rand();
       }
     }
   };
   static void clear() {
+    for (int i = 0; i < ROWS * COLUMNS; i++) delete[] zobrist[i];
     delete[] zobrist;
   };
   size_t operator() (Key const& key) const
@@ -51,7 +58,7 @@ public:
 class EqualFn
 {
 public:
-  static void initialize(int _rows, int _columns) {
+  inline static void initialize(int _rows, int _columns) {
     ROWS = _rows;
     COLUMNS = _columns;
   };
@@ -63,15 +70,15 @@ public:
     return true;
   };
   private:
-  static int ROWS;
-  static int COLUMNS;
+  inline static int ROWS;
+  inline static int COLUMNS;
 };
 
 class HashMapTree {
   public:
   // Constructor/Deconstructor
-  HashMapTree(int _rows, int _columns);
-  HashMapTree(Key &root_key);
+  HashMapTree();
+  HashMapTree(GameInfo info);
   ~HashMapTree();
   HashMapTree(const HashMapTree &copy);
 

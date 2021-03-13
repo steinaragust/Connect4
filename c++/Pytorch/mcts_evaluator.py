@@ -67,7 +67,7 @@ class MCTS_Evaluator:
     while(not game.is_terminal_state()):
       self.turn = game.get_to_move()
       obj = None
-      random_move = False
+      random_move = move < 4
       print('move nr: %d' % (move))
       if (self.turn == game.PLAYER_1):
         self.agent_turn = 0 if player_1.get_name() == self.agent_1_name else 1
@@ -78,8 +78,6 @@ class MCTS_Evaluator:
         print('player 2 turn')
         obj = player_2.play(game, random_move)
       game.drop_piece_in_column(obj.column)
-      print(list(array('f', obj.policy)))
-      print(obj.column)
       game.print_board()
       print('\n\n')
       move += 1
@@ -106,6 +104,6 @@ def predict(values, states, turn, n_states):
   encoded = encode_for_predict(states, turn, n_states)
   evaluator.predict(encoded, values, n_states)
 
-evaluator = MCTS_Evaluator(predict, 0, 2)
+evaluator = MCTS_Evaluator(predict, 0, 5)
 
-score = evaluator.play_matches_cpu(1)
+score = evaluator.play_matches_cpu(10)

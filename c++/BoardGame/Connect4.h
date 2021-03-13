@@ -10,13 +10,13 @@ class Connect4 : public BoardGame {
   Connect4();
   Connect4(const Connect4 &copy);
   ~Connect4();
-  vector<string> get_valid_moves();
-  void make_move(string move);
-  void retract_move(string move);
+  vector<int> get_valid_moves();
+  void make_move(int move);
+  void retract_move(int move);
   bool winning_move();
   void reset();
-  int get_prior_index(string move);
-
+  int get_prior_index(int move);
+  bool is_terminal_state();
 
   private:
   bool is_valid_move(int move);

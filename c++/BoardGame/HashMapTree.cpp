@@ -1,13 +1,11 @@
 #include "HashMapTree.h"
 
-HashMapTree::HashMapTree(int _rows, int _columns) {
-  Hasher::initialize(_rows, _columns);
-  EqualFn::initialize(_rows, _columns);
-  _root = NULL;
-}
+HashMapTree::HashMapTree() {}
 
-HashMapTree::HashMapTree(Key &root_key) {
-  _root = add_node(root_key);
+HashMapTree::HashMapTree(GameInfo info) {
+  Hasher::initialize(info.ROWS, info.COLUMNS, info.nr_unique_pcs);
+  EqualFn::initialize(info.ROWS, info.COLUMNS);
+  _root = NULL;
 }
 
 HashMapTree::~HashMapTree() {

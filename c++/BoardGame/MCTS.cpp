@@ -1,35 +1,34 @@
 using namespace std;
 
-#include "../Connect4-Game/Game.h"
 #include "MCTSAgent.h"
 
 const double C = 0.2;
 
-TreeNodeLabel* expand(Connect4 &game, Key &key, MCTSAgent &agent) {
-  HashMapTree* tree = agent.get_tree();
-  TreeNodeLabel* node = tree->add_node(key);
+TreeNodeLabel* expand(BoardGame &game, Key &key, MCTSAgent &agent) {
+  TreeNodeLabel* node = agent.get_tree()->add_node(key);
+  int turn = game.get_to_move();
   vector<Key> states { key };
   vector<TreeNodeLabel*> nodes { node };
+  vector<int> turns { turn };
 
-  int turn = game.get_to_move();
-  agent.call_predict(states, nodes, turn);
+  agent.call_predict(states, turns, nodes);
 
   return node;
 }
 
-double game_final_score(Connect4 &game) {
+double game_final_score(BoardGame &game) {
   if (game.winning_move()) {
     return 1;
   }
   return 0.5;
 }
 
-double playout (Connect4 &game, vector<int> &path) {
+double playout (BoardGame &game, vector<int> &path) {
   int player = game.get_to_move();
   while (!game.is_terminal_state()) {
-    vector<int> moves = game.get_valid_columns();
+    vector<int> moves = game.get_valid_moves();
     int random_move = rand() % moves.size();
-    game.drop_piece_in_column(moves[random_move]);
+    game.make_move(moves[random_move]);
     path.push_back(moves[random_move]);
   }
   return game_final_score(game);
@@ -45,11 +44,15 @@ double PUCT(TreeNodeLabel* parent, TreeNodeLabel* child, int index) {
   return child->get_q() + child->get_p()[index] * C * (sqrt(log(parent->get_n()) / child->get_n()));
 }
 
-// Choose random child when there are more than one best child
-int choose_index(double (&values)[COLUMNS], int best_value_index) {
+double calculate_child_value(TreeNodeLabel* parent, TreeNodeLabel* child, int index, bool use_PUCT) {
+  return use_PUCT ? PUCT(parent, child, index) : UCT(parent, child, index);
+}
+
+// Choose random child if there are more than one best child
+int select_best_child(vector<double> children_values, int best_index) {
   vector<int> available_columns;
-  for (int i = 0; i < COLUMNS; i++) {
-    if (values[i] >= values[best_value_index]) {
+  for (int i = 0; i < children_values.size(); i++) {
+    if (children_values[i] >= children_values[best_index]) {
       available_columns.push_back(i);
     }
   }
@@ -57,38 +60,18 @@ int choose_index(double (&values)[COLUMNS], int best_value_index) {
   return available_columns[random_move];
 }
 
-int select_best_child(TreeNodeLabel* parent, TreeNodeLabel* (&children)[COLUMNS], bool use_PUCT) {
+double traverse(BoardGame &game, TreeNodeLabel *parent_node, MCTSAgent &agent, vector<int> &path) {
+  vector<int> available_moves = game.get_valid_moves();
+  vector<TreeNodeLabel*> children_nodes;
+  vector<double> children_values;
+  int best_index = -1;
   double best_child_value = numeric_limits<double>::lowest();
-  double child_values[COLUMNS];
-  int index = -1;
 
-  for (int i = 0; i < COLUMNS; i++) {
-    if (children[i] == NULL) {
-      child_values[i] = numeric_limits<double>::lowest();
-      continue;
-    }
-    double child_value = use_PUCT ? PUCT(parent, children[i], i) : UCT(parent, children[i], i);
-    child_values[i] = child_value;
-    if (child_value > best_child_value) {
-      best_child_value = child_value;
-      index = i;
-    }
-  }
-  
-  return choose_index(child_values, index);
-}
-
-double traverse(Connect4 &game, TreeNodeLabel *parent, vector<int> &path, MCTSAgent &agent) {
-  HashMapTree* tree = agent.get_tree();
-  TreeNodeLabel* nodes[COLUMNS];
-  for (int i = 0; i < COLUMNS; i++) nodes[i] = NULL;
-
-  vector<int> available_moves = game.get_valid_columns();
-
-  for (int m : available_moves) {
-    game.drop_piece_in_column(m);
+  for (int i = 0; i < available_moves.size(); i++) {
+    int m = available_moves[i];
+    game.make_move(m);
     Key child_key = game.get_board();
-    TreeNodeLabel* child_node = tree->get_node_label(child_key);
+    TreeNodeLabel* child_node = agent.get_tree()->get_node_label(child_key);
     if (child_node == NULL || child_node->get_n() == 0) {
       path.push_back(m);
       if (agent.use_NN_predict) {
@@ -96,14 +79,22 @@ double traverse(Connect4 &game, TreeNodeLabel *parent, vector<int> &path, MCTSAg
         return game.is_terminal_state() ? game_final_score(game) : child_node->get_q();
       }
       return playout(game, path);
+    } else {
+      double child_value = calculate_child_value(parent_node, child_node, game.get_prior_index(m), agent.use_NN_predict);
+      if (child_value > best_child_value) {
+        best_index = i;
+        best_child_value = child_value;
+      }
+      children_nodes.push_back(child_node);
+      children_values.push_back(child_value);
+      game.retract_move(m);
     }
-    game.retract_piece_in_column(m);
-    nodes[m] = child_node;
   }
-  int best_child = select_best_child(parent, nodes, agent.use_NN_predict);
-  game.drop_piece_in_column(best_child);
-  path.push_back(best_child);
-  return game.is_terminal_state() ? game_final_score(game) : traverse(game, nodes[best_child], path, agent);
+  best_index = select_best_child(children_values, best_index);
+
+  game.make_move(available_moves[best_index]);
+  path.push_back(available_moves[best_index]);
+  return game.is_terminal_state() ? game_final_score(game) : traverse(game, children_nodes[best_index], agent, path);
 }
 
 void backup_value(HashMapTree* tree, Key &key, double value) {
@@ -111,10 +102,10 @@ void backup_value(HashMapTree* tree, Key &key, double value) {
   node->add_visit(value);
 }
 
-void backup_simulation(Connect4 &game, HashMapTree* tree, vector<int> &path, double value) {
+void backup_simulation(BoardGame &game, HashMapTree* tree, vector<int> &path, double value) {
   for (vector<int>::reverse_iterator i = path.rbegin(); i != path.rend(); ++i ) { 
     Key key = game.get_board();
-    game.retract_piece_in_column(*i);
+    game.make_move(*i);
     backup_value(tree, key, value);
     value = -value;
   }
@@ -122,9 +113,9 @@ void backup_simulation(Connect4 &game, HashMapTree* tree, vector<int> &path, dou
   backup_value(tree, key, value);
 }
 
-void simulate(Connect4 &game, MCTSAgent &agent) {
+void simulate(BoardGame &game, MCTSAgent &agent) {
   vector<int> path;
   HashMapTree* tree = agent.get_tree();
-  double value = traverse(game, tree->get_root(), path, agent);
+  double value = traverse(game, tree->get_root(), agent, path);
   backup_simulation(game, tree, path, value);
 }

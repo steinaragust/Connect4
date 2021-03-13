@@ -9,26 +9,29 @@ using namespace std;
 
 typedef int** Key;
 
-class BoardGame {
-  public:
+struct GameInfo {
   int ROWS;
   int COLUMNS;
   int priors_arr_size;
+  int nr_unique_pcs;
+};
 
+class BoardGame {
+  public:
+  static GameInfo info;
   // Virtual functions that need to be implemented
-  virtual vector<string> get_valid_moves() = 0;
-  virtual void make_move(string move) = 0;
-  virtual void retract_move(string move) = 0;
+  virtual vector<int> get_valid_moves() = 0;
+  virtual void make_move(int move) = 0;
+  virtual void retract_move(int move) = 0;
   virtual bool winning_move() = 0;
   virtual void reset() = 0;
-  virtual int get_prior_index(string move) = 0;
+  virtual int get_prior_index(int move) = 0;
+  virtual bool is_terminal_state() = 0;
 
   int get_move_no();
   Key get_board();
   int get_to_move();
   int get_to_move_opponent();
-
-  bool is_terminal_state();
   void print_board();
 
   // Class constants

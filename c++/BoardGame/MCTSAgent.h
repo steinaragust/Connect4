@@ -1,23 +1,34 @@
 using namespace std;
 
 #include "HashMapTree.h"
-#include "./BoardGame.h"
+#include "BoardGame.cpp"
 
 #ifndef MCTSAGENT_H
 #define MCTSAGENT_H
 
 struct IterationValue {
-  string move;
+  int move;
   double q_value;
   double *q_values;
   int *n_values;
   double *policy;
+
+  IterationValue(int size) {
+    q_values = new double[size];
+    n_values = new int[size];
+    policy[size];
+  };
+  ~IterationValue() {
+    delete[] q_values;
+    delete[] n_values;
+    delete[] policy;
+  }
 };
 
 class MCTSAgent {
   public:
   // Constructor/Deconstructor
-  MCTSAgent(string name = "MCTSAgent", int iterations = 200, function<void(double**, int ***, int, int)> NN_predict = nullptr);
+  MCTSAgent(GameInfo game_info, string name = "MCTSAgent", int iterations = 200, function<void(double**, vector<int**>, vector<int>)> NN_predict = nullptr);
   ~MCTSAgent();
   MCTSAgent(const MCTSAgent &copy);
 
@@ -25,15 +36,15 @@ class MCTSAgent {
   string get_name();
   HashMapTree* get_tree();
   void set_root(BoardGame &game);
-  void reset();
-  IterationValue get_return_value(BoardGame &game, bool random_move);
-  void print_iteration_value(IterationValue &value);
-  IterationValue play(BoardGame &game, bool random_move = false);
+  void reset(BoardGame &agent);
+  IterationValue* get_return_value(BoardGame &game, bool random_move);
+  void print_iteration_value();
+  IterationValue* play(BoardGame &game, bool random_move = false);
   void can_win_now(BoardGame &game);
 
   // NN methods
-  void set_predict(function<void(double**, int ***, int, int)> f);
-  void call_predict(vector<Key> &states, vector<TreeNodeLabel*> &nodes, int turn);
+  void set_predict(function<void(double**, vector<int**>, vector<int>)> f);
+  void call_predict(vector<Key> &states, vector<int> &turns, vector<TreeNodeLabel*> &nodes);
 
   bool use_NN_predict;
   int _iteration_nr;
@@ -41,10 +52,10 @@ class MCTSAgent {
   int _nr_moves_so_far;
 
   private:
-  void fill_states(vector<Key> &states, int ***_states);
-  void free_states(int ***states, int length);
-  function<void(double**, int ***, int, int)> _predict;
+  function<void(double**, vector<int**>, vector<int>)> _predict;
 
+  GameInfo _game_info;
+  IterationValue *_latest_iteration_value;
   string _name;
   int _iterations;
   HashMapTree _tree;

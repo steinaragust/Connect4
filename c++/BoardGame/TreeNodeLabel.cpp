@@ -7,7 +7,9 @@ TreeNodeLabel::TreeNodeLabel() {
 }
 
 TreeNodeLabel::~TreeNodeLabel() {
-  delete[] _p;
+  if (_p != NULL) {
+    delete[] _p;
+  }
 }
 
 TreeNodeLabel::TreeNodeLabel(const TreeNodeLabel &copy) {}

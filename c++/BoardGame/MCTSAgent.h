@@ -1,7 +1,7 @@
 using namespace std;
 
 #include "HashMapTree.h"
-#include "BoardGame.cpp"
+#include "BoardGame.h"
 
 #ifndef MCTSAGENT_H
 #define MCTSAGENT_H
@@ -16,7 +16,7 @@ struct IterationValue {
   IterationValue(int size) {
     q_values = new double[size];
     n_values = new int[size];
-    policy[size];
+    policy = new double[size];
   };
   ~IterationValue() {
     delete[] q_values;

@@ -4,7 +4,7 @@ using namespace std;
 
 const double C = 0.2;
 
-TreeNodeLabel* expand(BoardGame &game, Key &key, MCTSAgent &agent) {
+inline TreeNodeLabel* expand(BoardGame &game, Key &key, MCTSAgent &agent) {
   TreeNodeLabel* node = agent.get_tree()->add_node(key);
   int turn = game.get_to_move();
   vector<Key> states { key };
@@ -16,14 +16,14 @@ TreeNodeLabel* expand(BoardGame &game, Key &key, MCTSAgent &agent) {
   return node;
 }
 
-double game_final_score(BoardGame &game) {
+inline double game_final_score(BoardGame &game) {
   if (game.winning_move()) {
     return 1;
   }
   return 0.5;
 }
 
-double playout (BoardGame &game, vector<int> &path) {
+inline double playout (BoardGame &game, vector<int> &path) {
   int player = game.get_to_move();
   while (!game.is_terminal_state()) {
     vector<int> moves = game.get_valid_moves();
@@ -34,22 +34,22 @@ double playout (BoardGame &game, vector<int> &path) {
   return game_final_score(game);
 }
 
-double UCT(TreeNodeLabel* parent, TreeNodeLabel* child, int index) {
+inline double UCT(TreeNodeLabel* parent, TreeNodeLabel* child, int index) {
   if (child->get_n() == 0) return numeric_limits<double>::max();
   return child->get_q() + C * (sqrt(log(parent->get_n()) / child->get_n()));
 }
 
-double PUCT(TreeNodeLabel* parent, TreeNodeLabel* child, int index) {
+inline double PUCT(TreeNodeLabel* parent, TreeNodeLabel* child, int index) {
   if (child->get_n() == 0) return numeric_limits<double>::max();
   return child->get_q() + child->get_p()[index] * C * (sqrt(log(parent->get_n()) / child->get_n()));
 }
 
-double calculate_child_value(TreeNodeLabel* parent, TreeNodeLabel* child, int index, bool use_PUCT) {
+inline double calculate_child_value(TreeNodeLabel* parent, TreeNodeLabel* child, int index, bool use_PUCT) {
   return use_PUCT ? PUCT(parent, child, index) : UCT(parent, child, index);
 }
 
 // Choose random child if there are more than one best child
-int select_best_child(vector<double> children_values, int best_index) {
+inline int select_best_child(vector<double> children_values, int best_index) {
   vector<int> available_columns;
   for (int i = 0; i < children_values.size(); i++) {
     if (children_values[i] >= children_values[best_index]) {
@@ -60,7 +60,7 @@ int select_best_child(vector<double> children_values, int best_index) {
   return available_columns[random_move];
 }
 
-double traverse(BoardGame &game, TreeNodeLabel *parent_node, MCTSAgent &agent, vector<int> &path) {
+inline double traverse(BoardGame &game, TreeNodeLabel *parent_node, MCTSAgent &agent, vector<int> &path) {
   vector<int> available_moves = game.get_valid_moves();
   vector<TreeNodeLabel*> children_nodes;
   vector<double> children_values;
@@ -97,15 +97,15 @@ double traverse(BoardGame &game, TreeNodeLabel *parent_node, MCTSAgent &agent, v
   return game.is_terminal_state() ? game_final_score(game) : traverse(game, children_nodes[best_index], agent, path);
 }
 
-void backup_value(HashMapTree* tree, Key &key, double value) {
+inline void backup_value(HashMapTree* tree, Key &key, double value) {
   TreeNodeLabel* node = tree->add_node(key);
   node->add_visit(value);
 }
 
-void backup_simulation(BoardGame &game, HashMapTree* tree, vector<int> &path, double value) {
+inline void backup_simulation(BoardGame &game, HashMapTree* tree, vector<int> &path, double value) {
   for (vector<int>::reverse_iterator i = path.rbegin(); i != path.rend(); ++i ) { 
     Key key = game.get_board();
-    game.make_move(*i);
+    game.retract_move(*i);
     backup_value(tree, key, value);
     value = -value;
   }
@@ -113,7 +113,7 @@ void backup_simulation(BoardGame &game, HashMapTree* tree, vector<int> &path, do
   backup_value(tree, key, value);
 }
 
-void simulate(BoardGame &game, MCTSAgent &agent) {
+inline void simulate(BoardGame &game, MCTSAgent &agent) {
   vector<int> path;
   HashMapTree* tree = agent.get_tree();
   double value = traverse(game, tree->get_root(), agent, path);

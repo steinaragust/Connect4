@@ -1,16 +1,13 @@
 #include "HashMapTree.h"
 
-HashMapTree::HashMapTree() {}
+int** Hasher::zobrist = Hasher::initialize();
 
-HashMapTree::HashMapTree(GameInfo info) {
-  Hasher::initialize(info.ROWS, info.COLUMNS, info.nr_unique_pcs);
-  EqualFn::initialize(info.ROWS, info.COLUMNS);
+HashMapTree::HashMapTree() {
   _root = NULL;
 }
 
 HashMapTree::~HashMapTree() {
   clear_map();
-  Hasher::clear();
 }
 
 HashMapTree::HashMapTree(const HashMapTree &copy) {}
@@ -47,16 +44,16 @@ TreeNodeLabel* HashMapTree::add_node(Key &key) {
 }
 
 Key HashMapTree::copy_key(Key key) {
-  Key new_key = new int*[ROWS];
-  for (int i = 0; i < ROWS; i++) {
-    new_key[i] = new int[COLUMNS];
-    for (int j = 0; j < COLUMNS; j++) new_key[i][j] = key[i][j];
+  Key new_key = new int*[BoardGame::info.ROWS];
+  for (int i = 0; i < BoardGame::info.ROWS; i++) {
+    new_key[i] = new int[BoardGame::info.COLUMNS];
+    for (int j = 0; j < BoardGame::info.COLUMNS; j++) new_key[i][j] = key[i][j];
   }
   return new_key;
 }
 
 void HashMapTree::delete_key(Key key) {
-  for (int i = 0; i < COLUMNS; i++) delete[] key[i];
+  for (int i = 0; i < BoardGame::info.COLUMNS; i++) delete[] key[i];
   delete[] key;
 }
 

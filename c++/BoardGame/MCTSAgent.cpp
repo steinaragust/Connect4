@@ -1,32 +1,30 @@
 #include "MCTSAgent.h"
+#include "MCTS.cpp"
 
-void simulate(BoardGame &game, MCTSAgent &agent);
-TreeNodeLabel* expand(BoardGame &game, TreeNodeLabel* node,  MCTSAgent &agent);
-
-MCTSAgent::MCTSAgent(GameInfo game_info, string name, int iterations, function<void(double**, vector<int**>, vector<int>)> NN_predict) {
+inline MCTSAgent::MCTSAgent(GameInfo game_info, string name, int iterations, function<void(double**, vector<int**>, vector<int>)> NN_predict) {
   _name = name;
   _iterations = iterations;
   _game_info = game_info;
-  _tree = HashMapTree(game_info);
+  _tree = HashMapTree();
   _predict = NN_predict;
   use_NN_predict = NN_predict != nullptr;
   _latest_iteration_value = new IterationValue(_game_info.priors_arr_size);
 }
 
-MCTSAgent::~MCTSAgent() {
+inline MCTSAgent::~MCTSAgent() {
   _tree.clear_map();
   _latest_iteration_value->~IterationValue();
 }
 
-string MCTSAgent::get_name() {
+inline string MCTSAgent::get_name() {
   return _name;
 }
 
-HashMapTree* MCTSAgent::get_tree() {
+inline HashMapTree* MCTSAgent::get_tree() {
   return &_tree;
 }
 
-void MCTSAgent::set_root(BoardGame &game) {
+inline void MCTSAgent::set_root(BoardGame &game) {
   Key root_key = game.get_board();
   TreeNodeLabel* root = _tree.set_root(root_key);
   if (use_NN_predict) {
@@ -39,7 +37,7 @@ void MCTSAgent::set_root(BoardGame &game) {
   }
 }
 
-void MCTSAgent::reset(BoardGame &game) {
+inline void MCTSAgent::reset(BoardGame &game) {
   _tree.clear_map();
   set_root(game);
   _iteration_nr = 0;
@@ -47,7 +45,7 @@ void MCTSAgent::reset(BoardGame &game) {
   _can_win = false;
 }
 
-IterationValue* MCTSAgent::play(BoardGame &game, bool random_move) {
+inline IterationValue* MCTSAgent::play(BoardGame &game, bool random_move) {
   reset(game);
   for ( ;_iteration_nr < _iterations; _iteration_nr += 1) {
     simulate(game, *this);
@@ -57,12 +55,13 @@ IterationValue* MCTSAgent::play(BoardGame &game, bool random_move) {
   return return_value;
 }
 
-IterationValue* MCTSAgent::get_return_value(BoardGame &game, bool random_move) {
+inline IterationValue* MCTSAgent::get_return_value(BoardGame &game, bool random_move) {
   int total = 0;
   int move = -1;
   int available_moves = 0;
   _latest_iteration_value->q_value = _tree.get_root()->get_q();
 
+  // POLICY er irrelevant ef use_NN = FALSE
   for (int i = 0; _game_info.priors_arr_size; i++) {
     _latest_iteration_value->q_values[i] = numeric_limits<double>::lowest();
     _latest_iteration_value->n_values[i] = numeric_limits<int>::min();
@@ -100,7 +99,7 @@ IterationValue* MCTSAgent::get_return_value(BoardGame &game, bool random_move) {
   return _latest_iteration_value;
 }
 
-void MCTSAgent::print_iteration_value() {
+inline void MCTSAgent::print_iteration_value() {
   printf("Move: %d\n", _latest_iteration_value->move);
   printf("q value: %lf\n", _latest_iteration_value->q_value);
   printf("n values: ");
@@ -132,12 +131,12 @@ void MCTSAgent::print_iteration_value() {
   printf("\n\n");
 }
 
-void MCTSAgent::set_predict(function<void(double**, vector<int**>, vector<int>)> f) {
+inline void MCTSAgent::set_predict(function<void(double**, vector<int**>, vector<int>)> f) {
   _predict = f;
   use_NN_predict = true;
 }
 
-void MCTSAgent::call_predict(vector<Key> &states, vector<int>& turns, vector<TreeNodeLabel*> &nodes) {
+inline void MCTSAgent::call_predict(vector<Key> &states, vector<int> &turns, vector<TreeNodeLabel*> &nodes) {
   double ** values = new double*[states.size()];
    for (int s = 0; s < states.size(); s++) {
     values[s] = new double[_game_info.priors_arr_size + 1];
@@ -153,7 +152,7 @@ void MCTSAgent::call_predict(vector<Key> &states, vector<int>& turns, vector<Tre
   return;
 }
 
-void MCTSAgent::can_win_now(BoardGame &game) {
+inline void MCTSAgent::can_win_now(BoardGame &game) {
   vector<int> moves = game.get_valid_moves();
   for (int m : moves) {
     game.make_move(m);

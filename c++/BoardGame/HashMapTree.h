@@ -13,38 +13,30 @@ using namespace std;
 
 class Hasher
 {
-private:
-inline static int NR_UNIQUE_PCS;
-inline static int ROWS;
-inline static int COLUMNS;
 // thread local for threads
-inline static int **zobrist;
+static int **zobrist;
 public:
-  ~Hasher() {
-    clear();
-  };
-  static void initialize(int _rows, int _columns, int _nr_unique_pcs) {
-    NR_UNIQUE_PCS = _nr_unique_pcs;
-    ROWS = _rows;
-    COLUMNS = _rows;
+  static int** initialize() {
     srand(time(0));
-    zobrist = new int*[ROWS * COLUMNS];
-    for (int i = 0; i < ROWS * COLUMNS; i++) {
-      zobrist[i] = new int[NR_UNIQUE_PCS];
-      for (int j = 0; j < NR_UNIQUE_PCS; j++) {
-        zobrist[i][j] = rand();
+    int size = BoardGame::info.ROWS * BoardGame::info.COLUMNS;
+    int** arr = new int*[size];
+    for (int i = 0; i < size; i++) {
+      arr[i] = new int[BoardGame::info.nr_unique_pcs];
+      for (int j = 0; j < BoardGame::info.nr_unique_pcs; j++) {
+        arr[i][j] = rand();
       }
     }
+    return arr;
   };
   static void clear() {
-    for (int i = 0; i < ROWS * COLUMNS; i++) delete[] zobrist[i];
+    for (int i = 0; i < BoardGame::info.ROWS * BoardGame::info.COLUMNS; i++) delete[] zobrist[i];
     delete[] zobrist;
   };
   size_t operator() (Key const& key) const
   {
     int h = 0;
-    for (int i = 0; i < ROWS; i++) {
-      for (int j = 0; j < COLUMNS; j++) {
+    for (int i = 0; i < BoardGame::info.ROWS; i++) {
+      for (int j = 0; j < BoardGame::info.COLUMNS; j++) {
         if (key[i][j] != 0) {
           int k = key[i][j] - 1;
           h = h ^ zobrist[(i + 1)*(j + 1) - 1][k];
@@ -58,27 +50,19 @@ public:
 class EqualFn
 {
 public:
-  inline static void initialize(int _rows, int _columns) {
-    ROWS = _rows;
-    COLUMNS = _columns;
-  };
   bool operator() (Key const& t1, Key const& t2) const
   {
-    for (int i = 0; i < ROWS; i++) {
-      for (int j = 0; j < COLUMNS; j++) if (t1[i][j] != t2[i][j]) return false;
+    for (int i = 0; i < BoardGame::info.ROWS; i++) {
+      for (int j = 0; j < BoardGame::info.COLUMNS; j++) if (t1[i][j] != t2[i][j]) return false;
     }
     return true;
   };
-  private:
-  inline static int ROWS;
-  inline static int COLUMNS;
 };
 
 class HashMapTree {
   public:
   // Constructor/Deconstructor
   HashMapTree();
-  HashMapTree(GameInfo info);
   ~HashMapTree();
   HashMapTree(const HashMapTree &copy);
 

@@ -1,6 +1,6 @@
 using namespace std;
 
-#include "BoardGame.cpp"
+#include "BoardGame.h"
 
 #ifndef CONNECT4_H
 #define CONNECT4_H
@@ -17,6 +17,11 @@ class Connect4 : public BoardGame {
   void reset();
   int get_prior_index(int move);
   bool is_terminal_state();
+  int get_move_no();
+  Key get_board();
+  int get_to_move();
+  int get_to_move_opponent();
+  void print_board();
 
   private:
   bool is_valid_move(int move);

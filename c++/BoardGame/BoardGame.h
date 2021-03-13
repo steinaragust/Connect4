@@ -27,12 +27,11 @@ class BoardGame {
   virtual void reset() = 0;
   virtual int get_prior_index(int move) = 0;
   virtual bool is_terminal_state() = 0;
-
-  int get_move_no();
-  Key get_board();
-  int get_to_move();
-  int get_to_move_opponent();
-  void print_board();
+  virtual int get_move_no() = 0;
+  virtual Key get_board() = 0;
+  virtual int get_to_move() = 0;
+  virtual int get_to_move_opponent() = 0;
+  virtual void print_board() = 0;
 
   // Class constants
   const int PLAYER_1 = 0;

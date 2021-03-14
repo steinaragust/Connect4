@@ -38,7 +38,7 @@ TreeNodeLabel* HashMapTree::add_node(Key &key) {
       Key new_key = copy_key(key);
       pair<Key, TreeNodeLabel*> new_pair(new_key, new_label);
       _node_labels.insert(new_pair);
-      return get_node_label(key);
+      return new_label;
   }
   return item;
 }
@@ -53,7 +53,7 @@ Key HashMapTree::copy_key(Key key) {
 }
 
 void HashMapTree::delete_key(Key key) {
-  for (int i = 0; i < BoardGame::info.COLUMNS; i++) delete[] key[i];
+  for (int i = 0; i < BoardGame::info.ROWS; i++) delete[] key[i];
   delete[] key;
 }
 

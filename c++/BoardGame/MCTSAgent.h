@@ -28,7 +28,7 @@ struct IterationValue {
 class MCTSAgent {
   public:
   // Constructor/Deconstructor
-  MCTSAgent(GameInfo game_info, string name = "MCTSAgent", int iterations = 200, function<void(double**, vector<int**>, vector<int>)> NN_predict = nullptr);
+  MCTSAgent(string name = "MCTSAgent", int iterations = 200, function<void(double**, vector<int**>, vector<int>)> NN_predict = nullptr);
   ~MCTSAgent();
   MCTSAgent(const MCTSAgent &copy);
 
@@ -54,7 +54,6 @@ class MCTSAgent {
   private:
   function<void(double**, vector<int**>, vector<int>)> _predict;
 
-  GameInfo _game_info;
   IterationValue *_latest_iteration_value;
   string _name;
   int _iterations;

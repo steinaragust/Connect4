@@ -40,8 +40,8 @@ void TreeNodeLabel::add_visit(double value) {
   _q += (value - _q) / _n;
 }
 
-void TreeNodeLabel::print_p(int length) {
+void TreeNodeLabel::print_p() {
   printf("Printing p values: \n");
-  for (int i = 0; i < length; i++) printf("%lf ", _p[i]);
+  for (int i = 0; i < BoardGame::info.priors_arr_size; i++) printf("%lf ", _p[i]);
   printf("\n");
 }

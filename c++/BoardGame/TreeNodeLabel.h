@@ -3,6 +3,7 @@ using namespace std;
 #include <array>
 #include <vector>
 #include "math.h"
+#include "BoardGame.h"
 
 #ifndef TREENODELABEL_H
 #define TREENODELABEL_H
@@ -21,7 +22,7 @@ class TreeNodeLabel {
   double* get_p();
   void set_p(double *value);
   void add_visit(double value);
-  void print_p(int length);
+  void print_p();
 
   private:
   int _n;

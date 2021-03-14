@@ -24,7 +24,6 @@ inline double game_final_score(BoardGame &game) {
 }
 
 inline double playout (BoardGame &game, vector<int> &path) {
-  int player = game.get_to_move();
   while (!game.is_terminal_state()) {
     vector<int> moves = game.get_valid_moves();
     int random_move = rand() % moves.size();
@@ -105,8 +104,8 @@ inline void backup_value(HashMapTree* tree, Key &key, double value) {
 inline void backup_simulation(BoardGame &game, HashMapTree* tree, vector<int> &path, double value) {
   for (vector<int>::reverse_iterator i = path.rbegin(); i != path.rend(); ++i ) { 
     Key key = game.get_board();
-    game.retract_move(*i);
     backup_value(tree, key, value);
+    game.retract_move(*i);
     value = -value;
   }
   Key key = game.get_board();

@@ -30,7 +30,7 @@ struct IterationValue {
 class MCTSAgent {
   public:
   // Constructor/Deconstructor
-  MCTSAgent(string name = "MCTSAgent", int iterations = 200, bool use_NN_predict = false);
+  MCTSAgent(string name, int iterations, bool use_NN_predict);
   virtual ~MCTSAgent();
   MCTSAgent(const MCTSAgent &copy);
 

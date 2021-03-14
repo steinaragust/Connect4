@@ -73,13 +73,13 @@ inline double traverse(BoardGame &game, TreeNodeLabel *parent_node, MCTSAgent &a
     TreeNodeLabel* child_node = agent.get_tree()->get_node_label(child_key);
     if (child_node == NULL || child_node->get_n() == 0) {
       path.push_back(m);
-      if (agent.use_NN_predict) {
+      if (agent._use_NN_predict) {
         child_node = expand(game, child_key, agent);
         return game.is_terminal_state() ? game_final_score(game) : child_node->get_q();
       }
       return playout(game, path);
     } else {
-      double child_value = calculate_child_value(parent_node, child_node, game.get_prior_index(m), agent.use_NN_predict);
+      double child_value = calculate_child_value(parent_node, child_node, game.get_prior_index(m), agent._use_NN_predict);
       if (child_value > best_child_value) {
         best_index = i;
         best_child_value = child_value;

@@ -1,12 +1,11 @@
 #include "MCTSAgent.h"
 #include "MCTS.cpp"
 
-inline MCTSAgent::MCTSAgent(string name, int iterations, function<void(double**, vector<int**>, vector<int>)> NN_predict) {
+inline MCTSAgent::MCTSAgent(string name, int iterations, bool use_NN_predict) {
   _name = name;
   _iterations = iterations;
   _tree = HashMapTree();
-  _predict = NN_predict;
-  use_NN_predict = NN_predict != nullptr;
+  _use_NN_predict = use_NN_predict;
   _latest_iteration_value = new IterationValue(BoardGame::info.priors_arr_size);
 }
 
@@ -26,13 +25,12 @@ inline HashMapTree* MCTSAgent::get_tree() {
 inline void MCTSAgent::set_root(BoardGame &game) {
   Key root_key = game.get_board();
   TreeNodeLabel* root = _tree.set_root(root_key);
-  if (use_NN_predict) {
+  if (_use_NN_predict) {
     int turn = game.get_to_move();
     vector<Key> states { root_key };
     vector<TreeNodeLabel*> nodes { root };
     vector <int> turns = { turn };
     call_predict(states, turns, nodes);
-    root->print_p();
   }
 }
 
@@ -136,18 +134,13 @@ inline void MCTSAgent::print_iteration_value() {
   printf("\n\n");
 }
 
-inline void MCTSAgent::set_predict(function<void(double**, vector<int**>, vector<int>)> f) {
-  _predict = f;
-  use_NN_predict = true;
-}
-
 inline void MCTSAgent::call_predict(vector<Key> &states, vector<int> &turns, vector<TreeNodeLabel*> &nodes) {
   double ** values = new double*[states.size()];
    for (int s = 0; s < states.size(); s++) {
     values[s] = new double[BoardGame::info.priors_arr_size + 1];
   }
 
-  _predict(values, states, turns);
+  predict(values, states, turns);
 
   for (int i = 0; i < states.size(); i++) {
     nodes[i]->set_p(values[i]);

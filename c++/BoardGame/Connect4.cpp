@@ -1,9 +1,7 @@
 #include "Connect4.h"
 
-// Initialize Game specific variables for abstract class BoardGame
-inline GameInfo BoardGame::info = { 6, 7, 7, 2 };
-
 inline Connect4::Connect4() {
+  info = { 6, 7, 7, 2 };
   _board = new int*[info.ROWS];
   for (int i = 0; i < info.ROWS; i++) _board[i] = new int[info.COLUMNS];
   reset();

@@ -6,8 +6,6 @@ using namespace std;
 #ifndef MCTSAGENT_H
 #define MCTSAGENT_H
 
-typedef void (*Predict_func) (double**, vector<int**>, vector<int>);
-
 struct IterationValue {
   int move;
   double q_value;
@@ -30,7 +28,7 @@ struct IterationValue {
 class MCTSAgent {
   public:
   // Constructor/Deconstructor
-  MCTSAgent(string name, int iterations, bool use_NN_predict);
+  MCTSAgent(GameInfo info, string name, int iterations, bool use_NN_predict);
   virtual ~MCTSAgent();
   MCTSAgent(const MCTSAgent &copy);
 
@@ -53,6 +51,7 @@ class MCTSAgent {
   int _iteration_nr;
   bool _can_win;
   int _nr_moves_so_far;
+  GameInfo _info;
 
   private:
   IterationValue *_latest_iteration_value;

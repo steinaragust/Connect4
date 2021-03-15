@@ -22,7 +22,7 @@ class TreeNodeLabel {
   double* get_p();
   void set_p(double *value);
   void add_visit(double value);
-  void print_p();
+  void print_p(int size);
 
   private:
   int _n;

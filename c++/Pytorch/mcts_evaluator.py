@@ -6,7 +6,7 @@ from resnet import ResNet
 from utils import encode_for_predict
 from array import array
 
-model_path = 'data/models'
+model_path = 'data/older_models'
 
 cppyy.include('../Connect4-Game/Game.cpp')
 cppyy.include('../MCTS/TreeNodeLabel.cpp')
@@ -67,7 +67,7 @@ class MCTS_Evaluator:
     while(not game.is_terminal_state()):
       self.turn = game.get_to_move()
       obj = None
-      random_move = move < 4
+      random_move = False
       print('move nr: %d' % (move))
       if (self.turn == game.PLAYER_1):
         self.agent_turn = 0 if player_1.get_name() == self.agent_1_name else 1
@@ -104,6 +104,6 @@ def predict(values, states, turn, n_states):
   encoded = encode_for_predict(states, turn, n_states)
   evaluator.predict(encoded, values, n_states)
 
-evaluator = MCTS_Evaluator(predict, 0, 8, 300)
+evaluator = MCTS_Evaluator(predict, 7, 7, 200)
 
-score = evaluator.play_matches_cpu(3)
+score = evaluator.play_matches_cpu(1)

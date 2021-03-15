@@ -18,7 +18,7 @@ struct GameInfo {
 
 class BoardGame {
   public:
-  static GameInfo info;
+  GameInfo info;
   // Virtual functions that need to be implemented
   virtual vector<int> get_valid_moves() = 0;
   virtual void make_move(int move) = 0;

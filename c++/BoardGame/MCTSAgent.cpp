@@ -1,12 +1,13 @@
 #include "MCTSAgent.h"
 #include "MCTS.cpp"
 
-inline MCTSAgent::MCTSAgent(string name, int iterations, bool use_NN_predict) {
+inline MCTSAgent::MCTSAgent(GameInfo info, string name, int iterations, bool use_NN_predict) {
   _name = name;
+  _info = info;
   _iterations = iterations;
-  _tree = HashMapTree();
+  _tree = HashMapTree(info);
   _use_NN_predict = use_NN_predict;
-  _latest_iteration_value = new IterationValue(BoardGame::info.priors_arr_size);
+  _latest_iteration_value = new IterationValue(info.priors_arr_size);
 }
 
 inline MCTSAgent::~MCTSAgent() {
@@ -53,7 +54,6 @@ inline IterationValue* MCTSAgent::play(BoardGame &game, bool random_move) {
   }
   IterationValue* return_value = get_return_value(game, random_move);
   print_iteration_value();
-  
   return return_value;
 }
 
@@ -63,14 +63,12 @@ inline IterationValue* MCTSAgent::get_return_value(BoardGame &game, bool random_
   int available_moves = 0;
   TreeNodeLabel* root = _tree.get_root();
   _latest_iteration_value->q_value = _tree.get_root()->get_q();
-
-  for (int i = 0; i < BoardGame::info.priors_arr_size; i++) {
+  for (int i = 0; i < _info.priors_arr_size; i++) {
     _latest_iteration_value->q_values[i] = numeric_limits<double>::lowest();
     _latest_iteration_value->n_values[i] = numeric_limits<int>::min();
     _latest_iteration_value->policy[i] = 0.0;
   }
   vector<int> moves = game.get_valid_moves();
-
   for (int m : moves) {
     game.make_move(m);
     int p_index = game.get_prior_index(m);
@@ -106,7 +104,7 @@ inline void MCTSAgent::print_iteration_value() {
   printf("Move: %d\n", _latest_iteration_value->move);
   printf("q value: %lf\n", _latest_iteration_value->q_value);
   printf("n values: ");
-  for (int i = 0; i < BoardGame::info.priors_arr_size; i++) {
+  for (int i = 0; i < _info.priors_arr_size; i++) {
     if (_latest_iteration_value->n_values[i] > numeric_limits<int>::min()) {
       printf("%d ", _latest_iteration_value->n_values[i]);
     } else {
@@ -115,7 +113,7 @@ inline void MCTSAgent::print_iteration_value() {
   }
   printf("\n");
   printf("q values: ");
-  for (int i = 0; i < BoardGame::info.priors_arr_size; i++) {
+  for (int i = 0; i < _info.priors_arr_size; i++) {
     if (_latest_iteration_value->n_values[i] > numeric_limits<int>::min()) {
       printf("%lf ", _latest_iteration_value->q_values[i]);
     } else {
@@ -124,7 +122,7 @@ inline void MCTSAgent::print_iteration_value() {
   }
   printf("\n");
   printf("policy values: ");
-  for (int i = 0; i < BoardGame::info.priors_arr_size; i++) {
+  for (int i = 0; i < _info.priors_arr_size; i++) {
     if (_latest_iteration_value->n_values[i] > numeric_limits<int>::min()) {
       printf("%lf ", _latest_iteration_value->policy[i]);
     } else {
@@ -137,7 +135,7 @@ inline void MCTSAgent::print_iteration_value() {
 inline void MCTSAgent::call_predict(vector<Key> &states, vector<int> &turns, vector<TreeNodeLabel*> &nodes) {
   double ** values = new double*[states.size()];
    for (int s = 0; s < states.size(); s++) {
-    values[s] = new double[BoardGame::info.priors_arr_size + 1];
+    values[s] = new double[_info.priors_arr_size + 1];
   }
 
   predict(values, states, turns);
@@ -145,7 +143,7 @@ inline void MCTSAgent::call_predict(vector<Key> &states, vector<int> &turns, vec
   for (int i = 0; i < states.size(); i++) {
     nodes[i]->set_p(values[i]);
     // q-value is last index
-    nodes[i]->set_q(values[i][BoardGame::info.priors_arr_size]);
+    nodes[i]->set_q(values[i][_info.priors_arr_size]);
   }
   return;
 }

@@ -42,7 +42,7 @@ double UCT(TreeNodeLabel* parent, TreeNodeLabel* child, int index) {
 
 double PUCT(TreeNodeLabel* parent, TreeNodeLabel* child, int index) {
   if (child->get_n() == 0) return numeric_limits<double>::max();
-  return child->get_q() + child->get_p()[index] * C * (sqrt(log(parent->get_n()) / child->get_n()));
+  return child->get_q() + parent->get_p()[index] * C * (sqrt(log(parent->get_n()) / child->get_n()));
 }
 
 // Choose random child when there are more than one best child

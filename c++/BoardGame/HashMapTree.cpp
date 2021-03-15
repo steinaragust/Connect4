@@ -1,6 +1,7 @@
 #include "HashMapTree.h"
 
-int** Hasher::zobrist = NULL;
+unique_ptr<unique_ptr<int[]>[]> Hasher::zobrist;
+
 int Hasher::ROWS = -1;
 int Hasher::COLUMNS = -1;
 int Hasher::NR_UNIQUE_PCS = -1;
@@ -8,8 +9,8 @@ int Hasher::NR_UNIQUE_PCS = -1;
 HashMapTree::HashMapTree() {}
 
 HashMapTree::HashMapTree(GameInfo &info) {
-  if (Hasher::zobrist == NULL) {
-    Hasher::zobrist = Hasher::initialize(info);
+  if (Hasher::zobrist == nullptr) {
+    Hasher::initialize(info);
   }
   ROWS = info.ROWS;
   COLUMNS = info.COLUMNS;

@@ -15,28 +15,23 @@ class Hasher
 {
 // thread local for threads
 public:
-  static int **zobrist;
+  static unique_ptr<unique_ptr<int[]>[]> zobrist;
   static int ROWS;
   static int COLUMNS;
   static int NR_UNIQUE_PCS;
-  static int** initialize(GameInfo &info) {
+  static void initialize(GameInfo &info) {
     srand(time(0));
     ROWS = info.ROWS;
     COLUMNS = info.COLUMNS;
     NR_UNIQUE_PCS = info.nr_unique_pcs;
     int size = ROWS * COLUMNS;
-    int** arr = new int*[size];
+    zobrist = make_unique<unique_ptr<int[]>[] >(size);
     for (int i = 0; i < size; i++) {
-      arr[i] = new int[NR_UNIQUE_PCS];
-      for (int j = 0; j < NR_UNIQUE_PCS; j++) {
-        arr[i][j] = rand();
-      }
+        unique_ptr<int[]> temp_ptr(new int[NR_UNIQUE_PCS]);
+        for (int j = 0; j < NR_UNIQUE_PCS; j++)
+            temp_ptr[j] = rand();
+        zobrist[i] = move(temp_ptr);
     }
-    return arr;
-  };
-  static void clear() {
-    for (int i = 0; i < ROWS * COLUMNS; i++) delete[] zobrist[i];
-    delete[] zobrist;
   };
   size_t operator() (Key const& key) const
   {

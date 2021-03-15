@@ -104,6 +104,6 @@ def predict(values, states, turn, n_states):
   encoded = encode_for_predict(states, turn, n_states)
   evaluator.predict(encoded, values, n_states)
 
-evaluator = MCTS_Evaluator(predict, 0, 7, 300)
+evaluator = MCTS_Evaluator(predict, 0, 8, 300)
 
-score = evaluator.play_matches_cpu(10)
+score = evaluator.play_matches_cpu(3)

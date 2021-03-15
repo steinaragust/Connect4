@@ -149,17 +149,6 @@ void MCTSAgent::can_win_now(Connect4 &game) {
 
 IterationValue MCTSAgent::play(Connect4 game, bool random_move) {
   reset();
-  array<array<int, 7>, 6> state {{
-    {1,2,1,1,2,2,1},
-    {1,2,1,2,2,1,1},
-    {1,2,2,1,2,0,1},
-    {2,1,1,2,1,0,2},
-    {1,0,1,2,1,0,2},
-    {1,0,2,2,2,0,0}
-  }};
-
-  int turn = 1;
-  game.set_state(state, turn);
 
   set_root(game);
   _nr_moves_so_far = game.get_move_no();
@@ -168,7 +157,6 @@ IterationValue MCTSAgent::play(Connect4 game, bool random_move) {
   }
   IterationValue return_value = get_return_value(game, random_move);
   print_iteration_value(return_value);
-  game.print_board();
   
   return return_value;
 }

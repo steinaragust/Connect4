@@ -99,12 +99,13 @@ class MCTS_Trainer:
     game = Connect4.Connect4()
     moves = 0
     while(not game.is_terminal_state()):
+        random_move = moves < 4
         turn = game.get_to_move()
         obj = None
         if (turn == game.PLAYER_1):
-            obj = player_1.play(game, moves < 4)
+            obj = player_1.play(game, random_move)
         else:
-            obj = player_2.play(game, moves < 4)
+            obj = player_2.play(game, random_move)
         moves += 1
         self.states.append(game.get_board())
         self.turns.append(turn)

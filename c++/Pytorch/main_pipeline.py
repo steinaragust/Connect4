@@ -20,4 +20,4 @@ def train(nr_generations, nr_matches):
     trainer.save_latest_model()
     trainer.next_generation()
 
-train(2, 100)
+train(5, 100)

@@ -5970,3 +5970,33 @@ Policy data: tensor([0.0033, 0.0033, 0.6233, 0.3600, 0.0033, 0.0033, 0.0033])
 Policy pred: tensor([0.0029, 0.0036, 0.6257, 0.3569, 0.0035, 0.0032, 0.0040],
        grad_fn=<SelectBackward>)Value (actual, predicted): -0.000 -0.001
 
+[Epoch: 200, batch: 43/217] total loss per batch: 0.693
+Policy (actual, predicted): 3 3
+Policy data: tensor([0.0267, 0.0067, 0.0067, 0.9367, 0.0100, 0.0067, 0.0067])
+Policy pred: tensor([0.0266, 0.0056, 0.0062, 0.9368, 0.0107, 0.0069, 0.0072],
+       grad_fn=<SelectBackward>)Value (actual, predicted): -0.005 -0.004
+
+[Epoch: 200, batch: 86/217] total loss per batch: 0.698
+Policy (actual, predicted): 4 4
+Policy data: tensor([0.0033, 0.0033, 0.0033, 0.0033, 0.9800, 0.0033, 0.0033])
+Policy pred: tensor([0.0030, 0.0021, 0.0035, 0.0033, 0.9816, 0.0036, 0.0031],
+       grad_fn=<SelectBackward>)Value (actual, predicted): -0.979 -0.983
+
+[Epoch: 200, batch: 129/217] total loss per batch: 0.694
+Policy (actual, predicted): 5 5
+Policy data: tensor([0.0133, 0.0167, 0.0100, 0.0200, 0.3533, 0.5733, 0.0133])
+Policy pred: tensor([0.0127, 0.0162, 0.0091, 0.0180, 0.3405, 0.5912, 0.0121],
+       grad_fn=<SelectBackward>)Value (actual, predicted): 0.009 0.009
+
+[Epoch: 200, batch: 172/217] total loss per batch: 0.681
+Policy (actual, predicted): 3 3
+Policy data: tensor([0.0067, 0.0033, 0.0100, 0.9533, 0.0133, 0.0100, 0.0033])
+Policy pred: tensor([0.0057, 0.0030, 0.0083, 0.9567, 0.0120, 0.0111, 0.0031],
+       grad_fn=<SelectBackward>)Value (actual, predicted): 0.005 0.005
+
+[Epoch: 200, batch: 215/217] total loss per batch: 0.690
+Policy (actual, predicted): 2 2
+Policy data: tensor([0.0033, 0.0033, 0.6233, 0.3600, 0.0033, 0.0033, 0.0033])
+Policy pred: tensor([0.0036, 0.0038, 0.6265, 0.3548, 0.0034, 0.0043, 0.0036],
+       grad_fn=<SelectBackward>)Value (actual, predicted): -0.000 -0.000
+

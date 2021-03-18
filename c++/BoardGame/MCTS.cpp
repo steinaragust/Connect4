@@ -59,6 +59,11 @@ inline int select_best_child(vector<double> children_values, int best_index) {
   return available_columns[random_move];
 }
 
+inline bool first_visit(vector<TreeNodeLabel*> children_nodes) {
+  for (TreeNodeLabel* node : children_nodes) if (node->get_n() != 1) return false;
+  return true;
+}
+
 inline double traverse(BoardGame &game, TreeNodeLabel *parent_node, MCTSAgent &agent, vector<int> &path) {
   vector<int> available_moves = game.get_valid_moves();
   vector<TreeNodeLabel*> children_nodes;
@@ -89,6 +94,13 @@ inline double traverse(BoardGame &game, TreeNodeLabel *parent_node, MCTSAgent &a
       game.retract_move(m);
     }
   }
+  // if (parent_node == agent.get_tree()->get_root() && first_visit(children_nodes)) {
+  //   printf("Printing initial children state values:\n");
+  //   for (int i = 0; i < children_nodes.size(); i++) {
+  //     printf("%d:%lf ", available_moves[i], children_nodes[i]->get_q());
+  //   }
+  //   printf("\n");
+  // }
   best_index = select_best_child(children_values, best_index);
 
   game.make_move(available_moves[best_index]);

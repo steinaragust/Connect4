@@ -32,6 +32,7 @@ inline void MCTSAgent::set_root(BoardGame &game) {
     vector<TreeNodeLabel*> nodes { root };
     vector <int> turns = { turn };
     call_predict(states, turns, nodes);
+    root->print_p(_info.priors_arr_size);
   }
 }
 

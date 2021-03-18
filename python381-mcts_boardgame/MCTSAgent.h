@@ -40,7 +40,7 @@ class MCTSAgent {
   IterationValue* get_return_value(BoardGame &game, bool random_move);
   void print_iteration_value();
   IterationValue* play(BoardGame &game, bool random_move = false);
-  void can_win_now(BoardGame &game);
+  int can_win_now(BoardGame &game);
 
   // NN methods
   void call_predict(vector<Key> &states, vector<int> &turns, vector<TreeNodeLabel*> &nodes);
@@ -49,7 +49,6 @@ class MCTSAgent {
 
   bool _use_NN_predict;
   int _iteration_nr;
-  bool _can_win;
   int _nr_moves_so_far;
   GameInfo _info;
 

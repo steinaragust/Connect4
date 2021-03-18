@@ -40,20 +40,15 @@ inline void MCTSAgent::reset(BoardGame &game) {
   set_root(game);
   _iteration_nr = 0;
   _nr_moves_so_far = game.get_move_no();
-  _can_win = false;
 }
 
 inline IterationValue* MCTSAgent::play(BoardGame &game, bool random_move) {
   reset(game);
-  // can_win_now(game);
-  // if (_can_win) {
-  //   printf("can win!!!\n");
-  // }
   for ( ;_iteration_nr < _iterations; _iteration_nr += 1) {
     simulate(game, *this);
   }
   IterationValue* return_value = get_return_value(game, random_move);
-  print_iteration_value();
+  // print_iteration_value();
   return return_value;
 }
 
@@ -148,16 +143,15 @@ inline void MCTSAgent::call_predict(vector<Key> &states, vector<int> &turns, vec
   return;
 }
 
-inline void MCTSAgent::can_win_now(BoardGame &game) {
+inline int MCTSAgent::can_win_now(BoardGame &game) {
   vector<int> moves = game.get_valid_moves();
   for (int m : moves) {
     game.make_move(m);
     bool winning_move = game.winning_move();
     game.retract_move(m);
     if (winning_move) {
-      _can_win = true;
-      return;
+      return m;
     }
   }
-  _can_win = false;
+  return -1;
 }

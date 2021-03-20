@@ -12,7 +12,7 @@ def train(nr_generations, nr_matches):
   for g in range(start_generation, start_generation + nr_generations):
     # One iteration
     print('Generation %d starting' % (g))
-    trainer.play_matches(nr_matches)
+    trainer.play_games(nr_matches)
     data = trainer.get_training_set()
     train_dataset(data, trainer.model, trainer.generation)
     trainer.save_latest_dataset()

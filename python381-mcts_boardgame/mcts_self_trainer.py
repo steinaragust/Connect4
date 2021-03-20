@@ -50,6 +50,7 @@ class MCTS_Self_Trainer:
     fpath = model_path + '/model_' + str(model_n) + '.pt'
     self.model.load_state_dict(torch.load(fpath))
     self.model.eval()
+    print('%s loaded\n' % (fpath))
     return True
 
   # Saves the latest, newly trained model
@@ -84,23 +85,24 @@ class MCTS_Self_Trainer:
     while(not self.game.is_terminal_state()):
         random_move = moves < self.nr_random_moves
         turn = self.game.get_to_move()
-        obj = None
         obj = self.agent.play(self.game, random_move)
-        moves += 1
         self.states.append(self.game.get_board())
         self.turns.append(turn)
         policy = list([obj.policy[i] for i in range(self.game.info.priors_arr_size)])
+        print(policy)
+        print('\n')
         self.policies.append(policy)
         self.values.append(obj.q_value)
         self.game.make_move(obj.move)
+        moves += 1
     if self.game.winning_move():
         return 'Player_1' if self.game.get_to_move_opponent() == 0 else 'Player_2'
     return 'Draw'
   
-  def play_matches(self, n_matches = 200):
-    for m in range(n_matches):
+  def play_games(self, n_games = 200):
+    for m in range(n_games):
       should_print = ((m + 1) % 10) == 0
       if should_print:
-        print('Starting match nr: %d\n' % (m + 1))
+        print('Starting game nr: %d\n' % (m + 1))
       result = self.play_a_game()
       self.score[result] += 1

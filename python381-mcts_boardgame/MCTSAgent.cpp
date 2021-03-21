@@ -48,7 +48,6 @@ inline IterationValue* MCTSAgent::play(BoardGame &game, bool random_move) {
     simulate(game, *this);
   }
   IterationValue* return_value = get_return_value(game, random_move);
-  print_iteration_value();
   return return_value;
 }
 

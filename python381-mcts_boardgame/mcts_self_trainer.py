@@ -86,11 +86,11 @@ class MCTS_Self_Trainer:
         random_move = moves < self.nr_random_moves
         turn = self.game.get_to_move()
         obj = self.agent.play(self.game, random_move)
-        self.states.append(self.game.get_board())
         self.turns.append(turn)
+        state = self.game.get_board()
+        state = [[state[r][c] for c in range(self.game.info.COLUMNS)] for r in range(self.game.info.ROWS)]
+        self.states.append(state)
         policy = list([obj.policy[i] for i in range(self.game.info.priors_arr_size)])
-        print(policy)
-        print('\n')
         self.policies.append(policy)
         self.values.append(obj.q_value)
         self.game.make_move(obj.move)

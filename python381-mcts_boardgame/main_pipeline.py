@@ -1,3 +1,4 @@
+import time
 import cppyy
 from mcts_self_trainer import MCTS_Self_Trainer
 from train import train_dataset
@@ -19,4 +20,7 @@ def train(nr_generations, nr_matches):
     trainer.save_latest_model()
     trainer.next_generation()
 
+print('Starting training')
 train(1, 200)
+print('Training over')
+time.sleep(5)

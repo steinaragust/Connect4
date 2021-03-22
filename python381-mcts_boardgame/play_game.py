@@ -4,7 +4,7 @@ import random
 from resnet import ResNet
 from mcts_agent import MCTSAgent
 
-cppyy.include('./Connect4.cpp')
+cppyy.include('Connect4.cpp')
 
 model_path = 'data/models'
 
@@ -32,12 +32,15 @@ def load_model(model_n):
   
 def play_game(agent1, agent2):
   game.reset()
+  moves = 0
   while not game.is_terminal_state():
+    random_move = moves < 4
     agent = agent1 if game.get_to_move() == 0 else agent2
-    obj = agent.play(game)
+    obj = agent.play(game, random_move)
     game.make_move(obj.move)
-    game.print_board()
-    print('\n\n')
+    moves += 1
+    # game.print_board()
+    # print('\n\n')
   if not game.winning_move():
     return "Draw"
   return agent1.get_name() if game.get_to_move_opponent() == 0 else agent2.get_name()
@@ -47,7 +50,7 @@ model2 = load_model(5)
 game = cppyy.gbl.Connect4()
 agent1 = MCTSAgent(game.info, 'MCTSAgent1', 200, model1)
 agent2 = MCTSAgent(game.info, 'MCTSAgent2', 200, model2)
-scores = { agent1.get_name(): 0, agent2.get_name(): 0 }
+scores = { agent1.get_name(): 0, agent2.get_name(): 0, "Draw": 0 }
 
 for i in range(matches):
   winner1 = play_game(agent1, agent2)

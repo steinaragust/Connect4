@@ -13,6 +13,9 @@ class MCTSAgent(cppyy.gbl.MCTSAgent):
     self.model = model
     super().__init__(game_info, name, iterations, False if model == None else True)
 
+  def load_latest_model(self, model):
+    self.model = model
+
   def predict(self, values, states, turns):
     states_list = list(states)
     turns_list = list(turns)

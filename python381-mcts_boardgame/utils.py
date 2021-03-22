@@ -1,5 +1,40 @@
 import numpy as np
-from cppyy import ll
+from resnet import ResNet
+import torch
+from os import listdir
+from os.path import isfile, join
+import re
+
+dataset_path = 'data/datasets'
+model_path = 'data/models'
+
+def latest_generation():
+    files = [f for f in listdir(model_path) if isfile(join(model_path, f))]
+    if len(files) == 0:
+        return 0
+    numbers = []
+    for f in files:
+        m = re.search('^model_(\d+)\.pt$', f)
+        numbers.append(int(m.group(1)))
+    return max(numbers)
+
+def load_model(generation):
+    fpath = model_path + '/model_' + str(generation) + '.pt'
+    model = ResNet()
+    model.load_state_dict(torch.load(fpath))
+    model.eval()
+    return model
+
+def save_model(model, generation):
+    fpath = model_path + '/model_' + str(generation) + '.pt'
+    torch.save(model.state_dict(), fpath)
+
+def save_dataset(states, turns, policies, values, generation):
+    data = encode_for_training(states, turns, policies, values)
+    fpath = dataset_path + '/dataset_' + str(generation) + '.npy'
+    np.save(fpath, data)
+
+# Encode utils
 
 def encode_for_training(states, turns, policies, values):
     states = encode_states(states, turns)

@@ -43,9 +43,10 @@ def play_game(agent1, agent2):
   return agent1.get_name() if game.get_to_move_opponent() == 0 else agent2.get_name()
 
 model1 = load_model(0)
+model2 = load_model(5)
 game = cppyy.gbl.Connect4()
-agent1 = SimpleAgent(game.info)
-agent2 = MCTSAgent(game.info, 'MCTSAgent2', 200, model1)
+agent1 = MCTSAgent(game.info, 'MCTSAgent1', 200, model1)
+agent2 = MCTSAgent(game.info, 'MCTSAgent2', 200, model2)
 scores = { agent1.get_name(): 0, agent2.get_name(): 0 }
 
 for i in range(matches):

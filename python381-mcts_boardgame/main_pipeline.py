@@ -6,7 +6,7 @@ from train import train_dataset
 cppyy.include('./Connect4.cpp')
 
 game = cppyy.gbl.Connect4.Connect4()
-trainer = MCTS_Self_Trainer(game, 300, 4)
+trainer = MCTS_Self_Trainer(game, 300, 6)
 
 def train(nr_generations, nr_matches):
   start_generation = trainer.generation

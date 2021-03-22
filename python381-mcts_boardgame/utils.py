@@ -11,7 +11,7 @@ model_path = 'data/models'
 def latest_generation():
     files = [f for f in listdir(model_path) if isfile(join(model_path, f))]
     if len(files) == 0:
-        return 0
+        return -1
     numbers = []
     for f in files:
         m = re.search('^model_(\d+)\.pt$', f)
@@ -19,9 +19,10 @@ def latest_generation():
     return max(numbers)
 
 def load_model(generation):
-    fpath = model_path + '/model_' + str(generation) + '.pt'
     model = ResNet()
-    model.load_state_dict(torch.load(fpath))
+    if generation != -1:
+        fpath = model_path + '/model_' + str(generation) + '.pt'
+        model.load_state_dict(torch.load(fpath))
     model.eval()
     return model
 

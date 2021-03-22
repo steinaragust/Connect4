@@ -6,7 +6,7 @@ from mcts_agent import MCTSAgent
 cppyy.include('Connect4.cpp')
 
 nr_random_moves = 6
-simulations = 10
+simulations = 300
 
 def train_generations(nr_generations, nr_matches = 200):
   game = cppyy.gbl.Connect4.Connect4()
@@ -69,4 +69,4 @@ def train_generations(nr_generations, nr_matches = 200):
     save_dataset(states, turns, policies, values, generation)
     save_model(model, generation)
 
-train_generations(1, 1)
+train_generations(2, 200)

@@ -1,6 +1,7 @@
 import cppyy
 from utils import load_model, latest_generation, encode_for_training, save_dataset, save_model
 from train import train_dataset
+from resnet import ResNet
 from mcts_agent import MCTSAgent
 
 cppyy.include('Connect4.cpp')
@@ -11,7 +12,7 @@ simulations = 300
 def train_generations(nr_generations, nr_matches = 200):
   game = cppyy.gbl.Connect4.Connect4()
   generation = latest_generation()
-  model = load_model(generation)
+  model = ResNet()
   agent = MCTSAgent(game.info, 'MCTSAgent', simulations, model)
 
   states = []
@@ -27,7 +28,8 @@ def train_generations(nr_generations, nr_matches = 200):
     policies = []
     values = []
     score = { 'Player_1': 0, 'Player_2': 0, 'Draw': 0 }
-    agent.load_latest_model(model)
+    load_model(model, generation)
+    agent.load_model(model)
     generation += 1
 
   def play_a_game():

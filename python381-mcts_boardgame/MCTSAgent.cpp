@@ -154,3 +154,7 @@ inline int MCTSAgent::can_win_now(BoardGame &game) {
   }
   return -1;
 }
+
+inline void MCTSAgent::set_NN_predict(bool value) {
+  _use_NN_predict = value;
+}

@@ -18,13 +18,14 @@ def latest_generation():
         numbers.append(int(m.group(1)))
     return max(numbers)
 
-def load_model(generation):
-    model = ResNet()
+def load_model(model, generation):
     if generation != -1:
         fpath = model_path + '/model_' + str(generation) + '.pt'
         model.load_state_dict(torch.load(fpath))
+        print('Loaded model: %s' % (fpath))
+    else:
+        print('No model loaded')
     model.eval()
-    return model
 
 def save_model(model, generation):
     fpath = model_path + '/model_' + str(generation) + '.pt'

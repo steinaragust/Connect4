@@ -69,4 +69,6 @@ def train_generations(nr_generations, nr_matches = 200):
     save_dataset(states, turns, policies, values, generation)
     save_model(model, generation)
 
+print('Starting training')
 train_generations(2, 200)
+print('Training over')

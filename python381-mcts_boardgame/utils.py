@@ -35,6 +35,21 @@ def save_dataset(states, turns, policies, values, generation):
     fpath = dataset_path + '/dataset_' + str(generation) + '.npy'
     np.save(fpath, data)
 
+  # Loads dataset nr n. If n = -1, then will load latest dataset
+# def load_dataset(self, dataset_n = -1):
+#     if self.generation == 0:
+#         return False
+#     if dataset_n == -1:
+#         dataset_n = self.generation - 1
+#     fpath = dataset_path + '/dataset_' + str(dataset_n) + '.npy'
+#     dataset = np.load(fpath, allow_pickle=True)
+#     states, turns, policies, values = decode_training_data(dataset)
+#     self.states = states
+#     self.turns = turns
+#     self.policies = policies
+#     self.values = values
+#     return True
+
 # Encode utils
 
 def encode_for_training(states, turns, policies, values):

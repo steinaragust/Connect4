@@ -1,14 +1,16 @@
 import cppyy
-from timeit import default_timer as timer
+import time
 import statistics
+from resnet import ResNet
 from simple_agent import SimpleAgent
+from utils import load_model
 from mcts_agent import MCTSAgent
 
 cppyy.include('Connect4.cpp')
 
 results_path = 'data/eval_results'
 
-nr_random_moves = 0
+nr_random_moves = 4
 simulations = 300
 
 PLAYER_1 = 'Player_1'
@@ -158,7 +160,7 @@ def play_matches(agent1, agent2, nr_matches = 100):
   def play_game(agent1, agent2):
     game.reset()
     moves = 0
-    start_time = timer()
+    start_time = time.perf_counter()
     while(not game.is_terminal_state()):
         random_move = moves < nr_random_moves
         obj = None
@@ -168,23 +170,25 @@ def play_matches(agent1, agent2, nr_matches = 100):
           obj = agent2.play(game, random_move)
         game.make_move(obj.move)
         moves += 1
-    end_time = timer()
+    end_time = time.perf_counter()
     winner = DRAW
     if game.winning_move():
         winner = PLAYER_1 if game.get_to_move_opponent() == 0 else PLAYER_2
-    return winner, moves, end_time - start_time
+    time_taken = end_time - start_time
+    return winner, moves, time_taken
 
   agent1_name = agent1.get_name()
   agent2_name = agent2.get_name()
   
-  for _ in range(nr_matches):
+  for i in range(nr_matches):
+    if (i + 1) % 10 == 0:
+      print('Starting match nr: %d\n' % (i))
     result1, moves1, time1 = play_game(agent1, agent2)
     record_result(agent1_name, agent2_name, result1, moves1, time1)
     result2, moves2, time2 = play_game(agent2, agent1)
     record_result(agent2_name, agent1_name, result2, moves2, time2)
 
   result_file = results_path + '/' + str(agent1_name) + '_vs_' + str(agent2_name) + '.txt'
-  print(result_file)
   with open(result_file, 'a') as f:
     agent1_wins = scores[agent1_name][WIN][PLAYER_1] + scores[agent1_name][WIN][PLAYER_2]
     agent2_wins = scores[agent2_name][WIN][PLAYER_1] + scores[agent2_name][WIN][PLAYER_2]
@@ -193,8 +197,11 @@ def play_matches(agent1, agent2, nr_matches = 100):
     print_agent_summary(agent1_name, f)
     print_agent_summary(agent2_name, f)
 
+model1_nr = 8
+model1 = ResNet()
+load_model(model1, 8)
 
-agent1 = SimpleAgent(game.info, 'SimpleAgent_1')
-agent2 = SimpleAgent(game.info, 'SimpleAgent_2')
+agent1 = MCTSAgent(game.info, 'AZ_MCTS_Agent_Model-' + str(model1_nr), simulations, model1)
+agent2 = SimpleAgent(game.info, 'SimpleAgent')
 
-play_matches(agent1, agent2, 10)
+play_matches(agent1, agent2)

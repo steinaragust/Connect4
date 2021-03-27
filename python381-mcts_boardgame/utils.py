@@ -1,5 +1,4 @@
 import numpy as np
-from resnet import ResNet
 import torch
 from os import listdir
 from os.path import isfile, join

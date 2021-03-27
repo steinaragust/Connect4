@@ -2,6 +2,7 @@ import cppyy
 import torch
 import random
 from resnet import ResNet
+from simple_agent import SimpleAgent
 from mcts_agent import MCTSAgent
 
 cppyy.include('Connect4.cpp')
@@ -9,18 +10,6 @@ cppyy.include('Connect4.cpp')
 model_path = 'data/models'
 
 matches = 20
-
-class SimpleAgent:
-  def __init__(self, info):
-    self.agent = MCTSAgent(info, "SimpleAgent")
-  def play(self, game):
-    m = self.agent.can_win_now(game)
-    if m == -1:
-      moves = game.get_valid_moves()
-      m = random.choice(moves)
-    return type('',(object,),{"move": m})()
-  def get_name(self):
-    return self.agent.get_name()
 
 def load_model(model_n):
   fpath = model_path + '/model_' + str(model_n) + '.pt'

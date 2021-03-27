@@ -1,0 +1,70 @@
+SimpleAgent_1 wins a total of: 9 games, SimpleAgent_2 wins a total of: 11 games, draws: 0
+
+Starting summary for agent: SimpleAgent_1
+
+Total score: 9.000000, total score ratio: 0.450000
+
+Win ratios(excluding draws):
+Win ratio: 0.450000
+Win ratio: P1/P2: 0.555556/0.444444
+
+Loss ratios(excluding draws):
+Loss ratio: 0.550000
+Loss ratio: P1/P2: 0.454545/0.545455
+
+Draw ratio: P1/P2: 0.000000/0.000000
+
+Average number of moves for won/lost games: 15.888889/14.181818
+Standard deviation for number of moves for won/lost games: 3.100179/5.036232
+
+Average number of moves for won games playing as P1/P2: 15.800000/16.000000
+Standard deviation of moves for won games playing as P1/P2: 2.280351/4.320494
+
+Average number of moves for lost games playing as P1/P2: 14.000000/14.333333
+Standard deviation of moves for lost games playing as P1/P2: 2.449490/6.772493
+
+Average game length won/lost games: 0.000292/0.011515
+Standard deviation for game length for won/lost games: 0.000075/0.037251
+
+Average game length for won games playing as P1/P2: 0.000304/0.000276
+Standard deviation for game length for won games playing as P1/P2: 0.000082/0.000073
+
+Average game length for lost games playing as P1/P2: 0.024997/0.000279
+Standard deviation for game length for lost games playing as P1/P2: 0.055250/0.000172
+
+Ending summary
+
+Starting summary for agent: SimpleAgent_2
+
+Total score: 11.000000, total score ratio: 0.550000
+
+Win ratios(excluding draws):
+Win ratio: 0.550000
+Win ratio: P1/P2: 0.545455/0.454545
+
+Loss ratios(excluding draws):
+Loss ratio: 0.450000
+Loss ratio: P1/P2: 0.444444/0.555556
+
+Draw ratio: P1/P2: 0.000000/0.000000
+
+Average number of moves for won/lost games: 14.181818/15.888889
+Standard deviation for number of moves for won/lost games: 5.036232/3.100179
+
+Average number of moves for won games playing as P1/P2: 14.333333/14.000000
+Standard deviation of moves for won games playing as P1/P2: 6.772493/2.449490
+
+Average number of moves for lost games playing as P1/P2: 16.000000/15.800000
+Standard deviation of moves for lost games playing as P1/P2: 4.320494/2.280351
+
+Average game length won/lost games: 0.011515/0.000292
+Standard deviation for game length for won/lost games: 0.037251/0.000075
+
+Average game length for won games playing as P1/P2: 0.000279/0.024997
+Standard deviation for game length for won games playing as P1/P2: 0.000172/0.055250
+
+Average game length for lost games playing as P1/P2: 0.000276/0.000304
+Standard deviation for game length for lost games playing as P1/P2: 0.000073/0.000082
+
+Ending summary
+

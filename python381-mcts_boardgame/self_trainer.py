@@ -12,8 +12,7 @@ simulations = 300
 def train_generations(nr_generations, nr_matches = 200):
   game = cppyy.gbl.Connect4.Connect4()
   generation = latest_generation()
-  model = ResNet()
-  agent = MCTSAgent(game.info, 'MCTSAgent', simulations, model)
+  agent = MCTSAgent(game.info, 'MCTSAgent', simulations)
 
   states = []
   turns = []
@@ -22,20 +21,20 @@ def train_generations(nr_generations, nr_matches = 200):
   score = { 'Player_1': 0, 'Player_2': 0, 'Draw': 0 }
 
   def next_generation():
-    nonlocal states, turns, policies, values, score, model, agent, generation
+    nonlocal states, turns, policies, values, score, agent, generation
     states = []
     turns = []
     policies = []
     values = []
     score = { 'Player_1': 0, 'Player_2': 0, 'Draw': 0 }
-    load_model(model, generation)
+    model = load_model(generation)
     agent.load_model(model)
     generation += 1
 
   def play_a_game():
     game.reset()
     moves = 0
-    nonlocal states, turns, policies, values
+    nonlocal states, turns, policies, values, agent
     while(not game.is_terminal_state()):
         random_move = moves < nr_random_moves
         turn = game.get_to_move()
@@ -67,6 +66,7 @@ def train_generations(nr_generations, nr_matches = 200):
     print('Generation %d starting' % (generation))
     play_games(nr_matches)
     data = encode_for_training(states, turns, policies, values)
+    model = agent.get_model()
     train_dataset(data, model, generation)
     save_dataset(states, turns, policies, values, generation)
     save_model(model, generation)

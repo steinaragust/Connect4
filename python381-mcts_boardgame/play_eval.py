@@ -69,8 +69,8 @@ def play_matches(agent1, agent2, nr_matches = 100):
     agent_wins = scores[agent_name][WIN][PLAYER_1] + scores[agent_name][WIN][PLAYER_2]
     agent_win_ratio = agent_wins / nr_of_games
   
-    agent_p1_win_ratio = scores[agent_name][WIN][PLAYER_1] / agent_wins
-    agent_p2_win_ratio = scores[agent_name][WIN][PLAYER_2] / agent_wins
+    agent_p1_win_ratio = 0.0 if agent_wins == 0 else scores[agent_name][WIN][PLAYER_1] / agent_wins
+    agent_p2_win_ratio = 0.0 if agent_wins == 0 else scores[agent_name][WIN][PLAYER_2] / agent_wins
 
     agent_losses = scores[agent_name][LOSE][PLAYER_1] + scores[agent_name][LOSE][PLAYER_2]
     agent_loss_ratio = agent_losses / nr_of_games
@@ -164,7 +164,7 @@ def play_matches(agent1, agent2, nr_matches = 100):
     while(not game.is_terminal_state()):
         random_move = moves < nr_random_moves
         obj = None
-        if game.get_to_move == 0:
+        if game.get_to_move() == 0:
           obj = agent1.play(game, random_move)
         else:
           obj = agent2.play(game, random_move)
@@ -197,11 +197,10 @@ def play_matches(agent1, agent2, nr_matches = 100):
     print_agent_summary(agent1_name, f)
     print_agent_summary(agent2_name, f)
 
-model1_nr = 8
-model1 = ResNet()
-load_model(model1, 8)
+model1_nr = 6
+model1 = load_model(model1_nr)
 
 agent1 = MCTSAgent(game.info, 'AZ_MCTS_Agent_Model-' + str(model1_nr), simulations, model1)
 agent2 = SimpleAgent(game.info, 'SimpleAgent')
 
-play_matches(agent1, agent2)
+play_matches(agent1, agent2, 10)

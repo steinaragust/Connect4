@@ -197,10 +197,10 @@ def play_matches(agent1, agent2, nr_matches = 100):
     print_agent_summary(agent1_name, f)
     print_agent_summary(agent2_name, f)
 
-model1_nr = 6
+model1_nr = 8
 model1 = load_model(model1_nr)
 
 agent1 = MCTSAgent(game.info, 'AZ_MCTS_Agent_Model-' + str(model1_nr), simulations, model1)
 agent2 = SimpleAgent(game.info, 'SimpleAgent')
 
-play_matches(agent1, agent2, 10)
+play_matches(agent1, agent2)

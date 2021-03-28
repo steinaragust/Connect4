@@ -33,6 +33,7 @@ class MCTSAgent {
   MCTSAgent(const MCTSAgent &copy);
 
   // Public methods
+  void set_name(string name);
   string get_name();
   HashMapTree* get_tree();
   void set_root(BoardGame &game);

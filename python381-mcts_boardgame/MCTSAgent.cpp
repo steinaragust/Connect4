@@ -15,6 +15,10 @@ inline MCTSAgent::~MCTSAgent() {
   _latest_iteration_value->~IterationValue();
 }
 
+inline void MCTSAgent::set_name(string name) {
+  _name = name;
+}
+
 inline string MCTSAgent::get_name() {
   return _name;
 }

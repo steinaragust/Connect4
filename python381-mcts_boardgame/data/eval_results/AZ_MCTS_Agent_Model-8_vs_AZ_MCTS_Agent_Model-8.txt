@@ -1,21 +1,16 @@
-AZ_MCTS_Agent_Model-8 wins a total of: 138 games, AZ_MCTS_Agent_Model-8 wins a total of: 138 games, draws: 124
+AZ_MCTS_Agent_Model-8 wins a total of: 74 games, draws: 62
 
 Starting summary for agent: AZ_MCTS_Agent_Model-8
 
-Total score: 200.000000, total score ratio: 1.000000
-
 Win ratios(excluding draws):
-Win ratio: 0.690000
+Win/Loss ratio: 0.690000
 Win ratio: P1/P2: 0.594203/0.405797
 
 Loss ratios(excluding draws):
-Loss ratio: 0.690000
 Loss ratio: P1/P2: 0.405797/0.594203
 
-Draw ratio: P1/P2: 0.500000/0.500000
-
-Average number of moves for won/lost games: 32.202899/32.202899
-Standard deviation for number of moves for won/lost games: 11.532347/11.532347
+Average number of moves for won/lost games: 32.202899
+Standard deviation for number of moves for won/lost games: 11.532347
 
 Average number of moves for won games playing as P1/P2: 28.487805/37.642857
 Standard deviation of moves for won games playing as P1/P2: 13.520212/3.370614
@@ -23,8 +18,8 @@ Standard deviation of moves for won games playing as P1/P2: 13.520212/3.370614
 Average number of moves for lost games playing as P1/P2: 37.642857/28.487805
 Standard deviation of moves for lost games playing as P1/P2: 3.370614/13.520212
 
-Average game length won/lost games: 105.246353/105.246353
-Standard deviation for game length for won/lost games: 38.674905/38.674905
+Average game length won/lost games: 105.246353
+Standard deviation for game length for won/lost games: 38.674905
 
 Average game length for won games playing as P1/P2: 91.198885/125.815860
 Standard deviation for game length for won games playing as P1/P2: 44.478732/9.337619

@@ -1,0 +1,70 @@
+AZ_MCTS_Agent_Model-8 wins a total of: 121 games, AZ_MCTS_Agent_Model-4 wins a total of: 63 games, draws: 16
+
+Starting summary for agent: AZ_MCTS_Agent_Model-8
+
+Total score: 129.000000, total score ratio: 0.645000
+
+Win ratios(excluding draws):
+Win ratio: 0.605000
+Win ratio: P1/P2: 0.504132/0.495868
+
+Loss ratios(excluding draws):
+Loss ratio: 0.315000
+Loss ratio: P1/P2: 0.539683/0.460317
+
+Draw ratio: P1/P2: 0.312500/0.687500
+
+Average number of moves for won/lost games: 29.942149/28.015873
+Standard deviation for number of moves for won/lost games: 10.724036/12.593511
+
+Average number of moves for won games playing as P1/P2: 24.868852/35.100000
+Standard deviation of moves for won games playing as P1/P2: 11.887634/6.044188
+
+Average number of moves for lost games playing as P1/P2: 32.411765/22.862069
+Standard deviation of moves for lost games playing as P1/P2: 8.102067/14.927741
+
+Average game length won/lost games: 105.787428/99.068325
+Standard deviation for game length for won/lost games: 36.649735/45.187677
+
+Average game length for won games playing as P1/P2: 86.494237/125.402172
+Standard deviation for game length for won games playing as P1/P2: 40.068579/17.975861
+
+Average game length for lost games playing as P1/P2: 116.411106/78.735408
+Standard deviation for game length for lost games playing as P1/P2: 23.477254/55.483198
+
+Ending summary
+
+Starting summary for agent: AZ_MCTS_Agent_Model-4
+
+Total score: 71.000000, total score ratio: 0.355000
+
+Win ratios(excluding draws):
+Win ratio: 0.315000
+Win ratio: P1/P2: 0.460317/0.539683
+
+Loss ratios(excluding draws):
+Loss ratio: 0.605000
+Loss ratio: P1/P2: 0.495868/0.504132
+
+Draw ratio: P1/P2: 0.687500/0.312500
+
+Average number of moves for won/lost games: 28.015873/29.942149
+Standard deviation for number of moves for won/lost games: 12.593511/10.724036
+
+Average number of moves for won games playing as P1/P2: 22.862069/32.411765
+Standard deviation of moves for won games playing as P1/P2: 14.927741/8.102067
+
+Average number of moves for lost games playing as P1/P2: 35.100000/24.868852
+Standard deviation of moves for lost games playing as P1/P2: 6.044188/11.887634
+
+Average game length won/lost games: 99.068325/105.787428
+Standard deviation for game length for won/lost games: 45.187677/36.649735
+
+Average game length for won games playing as P1/P2: 78.735408/116.411106
+Standard deviation for game length for won games playing as P1/P2: 55.483198/23.477254
+
+Average game length for lost games playing as P1/P2: 125.402172/86.494237
+Standard deviation for game length for lost games playing as P1/P2: 17.975861/40.068579
+
+Ending summary
+

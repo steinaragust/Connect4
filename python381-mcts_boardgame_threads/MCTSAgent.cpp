@@ -1,18 +1,20 @@
 #include "MCTSAgent.h"
 #include "MCTS.cpp"
 
-inline MCTSAgent::MCTSAgent(GameInfo info, string name, int iterations, bool use_NN_predict) {
+inline MCTSAgent::MCTSAgent(GameInfo info, string name, int simulations, int nr_expands) {
   _name = name;
   _info = info;
-  _iterations = iterations;
+  _simulations = simulations;
   _tree = HashMapTree(info);
-  _use_NN_predict = use_NN_predict;
   _latest_iteration_value = new IterationValue(info.priors_arr_size);
+  _nr_expands = nr_expands;
+  _state_buffer = new Key[nr_expands];
 }
 
 inline MCTSAgent::~MCTSAgent() {
   _tree.clear_map();
   _latest_iteration_value->~IterationValue();
+  delete[] _state_buffer;
 }
 
 inline void MCTSAgent::set_name(string name) {
@@ -30,25 +32,23 @@ inline HashMapTree* MCTSAgent::get_tree() {
 inline void MCTSAgent::set_root(BoardGame &game) {
   Key root_key = game.get_board();
   TreeNodeLabel* root = _tree.set_root(root_key);
-  if (_use_NN_predict) {
-    int turn = game.get_to_move();
-    vector<Key> states { root_key };
-    vector<TreeNodeLabel*> nodes { root };
-    vector <int> turns = { turn };
-    call_predict(states, turns, nodes);
-  }
+  int turn = game.get_to_move();
+  vector<Key> states { root_key };
+  vector<TreeNodeLabel*> nodes { root };
+  vector <int> turns = { turn };
+  call_predict(states, turns, nodes);
 }
 
 inline void MCTSAgent::reset(BoardGame &game) {
   _tree.clear_map();
   set_root(game);
-  _iteration_nr = 0;
+  _simulation_nr = 0;
   _nr_moves_so_far = game.get_move_no();
 }
 
 inline IterationValue* MCTSAgent::play(BoardGame &game, bool random_move) {
   reset(game);
-  for ( ;_iteration_nr < _iterations; _iteration_nr += 1) {
+  while (_simulation_nr < _simulations) {
     simulate(game, *this);
   }
   IterationValue* return_value = get_return_value(game, random_move);
@@ -159,6 +159,9 @@ inline int MCTSAgent::can_win_now(BoardGame &game) {
   return -1;
 }
 
-inline void MCTSAgent::set_NN_predict(bool value) {
-  _use_NN_predict = value;
+inline int MCTSAgent::next_batch_simulations() {
+  if (_simulations - _simulation_nr < _max_nr_expands) {
+    return _simulations - _simulation_nr;
+  }
+  return _max_nr_expands;
 }

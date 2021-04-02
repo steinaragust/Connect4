@@ -9,9 +9,9 @@ cppyy.include('./HashMapTree.cpp')
 cppyy.include('./MCTSAgent.cpp')
 
 class MCTSAgent(cppyy.gbl.MCTSAgent):
-  def __init__(self, game_info, name = 'MCTSAgent', iterations = 200, model = None):
+  def __init__(self, game_info, name = 'MCTSAgent', simulations = 200, model = None):
     self.model = model
-    super().__init__(game_info, name, iterations, False if model == None else True)
+    super().__init__(game_info, name, simulations, False if model == None else True)
 
   def get_model(self):
     return self.model

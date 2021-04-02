@@ -3,6 +3,9 @@
 #include <unordered_map>
 #include <cstdlib>
 #include <ctime>
+#include <thread>
+#include <mutex>
+#include <condition_variable>
 #include "TreeNodeLabel.h"
 #include "BoardGame.h"
 

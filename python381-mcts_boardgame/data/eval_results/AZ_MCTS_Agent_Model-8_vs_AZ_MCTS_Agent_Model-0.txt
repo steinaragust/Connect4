@@ -4,11 +4,11 @@ Starting summary for agent: AZ_MCTS_Agent_Model-8
 
 Total score: 151.500000, total score ratio: 0.757500
 
-Win ratios(excluding draws):
+Win ratios, excluding draws:
 Win ratio: 0.725000
 Win ratio: P1/P2: 0.496552/0.503448
 
-Loss ratios(excluding draws):
+Loss ratios, excluding draws:
 Loss ratio: 0.210000
 Loss ratio: P1/P2: 0.452381/0.547619
 
@@ -38,11 +38,11 @@ Starting summary for agent: AZ_MCTS_Agent_Model-0
 
 Total score: 48.500000, total score ratio: 0.242500
 
-Win ratios(excluding draws):
+Win ratios, excluding draws:
 Win ratio: 0.210000
 Win ratio: P1/P2: 0.547619/0.452381
 
-Loss ratios(excluding draws):
+Loss ratios, excluding draws:
 Loss ratio: 0.725000
 Loss ratio: P1/P2: 0.503448/0.496552
 

@@ -1,12 +1,14 @@
-AZ_MCTS_Agent_Model-8 wins a total of: 74 games, draws: 62
+AZ_MCTS_Agent_Model-8 wins/loses a total of: 138 games, draws: 62
 
 Starting summary for agent: AZ_MCTS_Agent_Model-8
 
-Win ratios(excluding draws):
+Total score: 169.000000, total score ratio: 0.845000
+
+Win ratios, excluding draws:
 Win/Loss ratio: 0.690000
 Win ratio: P1/P2: 0.594203/0.405797
 
-Loss ratios(excluding draws):
+Loss ratios, excluding draws:
 Loss ratio: P1/P2: 0.405797/0.594203
 
 Average number of moves for won/lost games: 32.202899

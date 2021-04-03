@@ -1,20 +1,26 @@
 #include "MCTSAgent.h"
 #include "MCTS.cpp"
 
-inline MCTSAgent::MCTSAgent(GameInfo info, string name, int simulations, int nr_expands) {
+inline MCTSAgent::MCTSAgent(GameInfo info, string name, int simulations, int nr_threads) {
   _name = name;
   _info = info;
   _simulations = simulations;
   _tree = HashMapTree(info);
   _latest_iteration_value = new IterationValue(info.priors_arr_size);
-  _nr_expands = nr_expands;
-  _state_buffer = new Key[nr_expands];
+  _nr_threads = nr_threads;
+  _state_buffer = new Key[nr_threads];
+  _turns_buffer = new int[nr_threads];
+  _state_values_buffer = new double*[nr_threads];
+  thread _predict_worker_thread(predict_worker);
 }
 
 inline MCTSAgent::~MCTSAgent() {
   _tree.clear_map();
   _latest_iteration_value->~IterationValue();
+  _predict_worker_thread.detach();
   delete[] _state_buffer;
+  delete _turns_buffer;
+  delete[] _state_values_buffer;
 }
 
 inline void MCTSAgent::set_name(string name) {
@@ -32,24 +38,27 @@ inline HashMapTree* MCTSAgent::get_tree() {
 inline void MCTSAgent::set_root(BoardGame &game) {
   Key root_key = game.get_board();
   TreeNodeLabel* root = _tree.set_root(root_key);
+  root->add_visit();
   int turn = game.get_to_move();
-  vector<Key> states { root_key };
-  vector<TreeNodeLabel*> nodes { root };
-  vector <int> turns = { turn };
-  call_predict(states, turns, nodes);
+  _state_buffer[0] = root_key;
+  _turns_buffer[0] = turn;
+  call_predict();
+  root->backup_value(root->get_p()[_info.priors_arr_size]);
 }
 
 inline void MCTSAgent::reset(BoardGame &game) {
+  _simulation_nr = 0;
+  _thread_counter = 0;
+  next_batch_simulations();
   _tree.clear_map();
   set_root(game);
-  _simulation_nr = 0;
   _nr_moves_so_far = game.get_move_no();
 }
 
 inline IterationValue* MCTSAgent::play(BoardGame &game, bool random_move) {
   reset(game);
   while (_simulation_nr < _simulations) {
-    simulate(game, *this);
+    simulate_threads(game, *this);
   }
   IterationValue* return_value = get_return_value(game, random_move);
   return return_value;
@@ -130,20 +139,19 @@ inline void MCTSAgent::print_iteration_value() {
   printf("\n\n");
 }
 
-inline void MCTSAgent::call_predict(vector<Key> &states, vector<int> &turns, vector<TreeNodeLabel*> &nodes) {
-  double ** values = new double*[states.size()];
-   for (int s = 0; s < states.size(); s++) {
-    values[s] = new double[_info.priors_arr_size + 1];
+inline void MCTSAgent::call_predict() {
+  for (int i = 0; i < _nr_threads; i++) {
+    if (_state_buffer != NULL) {
+      _state_values_buffer[i] = new double[_info.priors_arr_size + 1];
+    }
   }
-
-  predict(values, states, turns);
-
-  for (int i = 0; i < states.size(); i++) {
-    nodes[i]->set_p(values[i]);
-    // q-value is last index
-    nodes[i]->set_q(values[i][_info.priors_arr_size]);
+  predict();
+  for (int i = 0; i < _nr_threads; i++) {
+    if (_state_buffer[i] != NULL) {
+      TreeNodeLabel* node = _tree.get_node_label(_state_buffer[i]);
+      node->set_p(_state_values_buffer[i]);
+    }
   }
-  return;
 }
 
 inline int MCTSAgent::can_win_now(BoardGame &game) {
@@ -160,8 +168,38 @@ inline int MCTSAgent::can_win_now(BoardGame &game) {
 }
 
 inline int MCTSAgent::next_batch_simulations() {
-  if (_simulations - _simulation_nr < _max_nr_expands) {
+  for (int i = 0; i < _nr_threads; i++) {
+    _state_buffer[i] = NULL;
+    _turns_buffer[i] = -1;
+    _state_values_buffer = NULL;
+  }
+  if (_simulations - _simulation_nr < _nr_threads) {
     return _simulations - _simulation_nr;
   }
-  return _max_nr_expands;
+  return _nr_threads;
+}
+
+inline void MCTSAgent::get_thread_ready_and_wait(int nr, Key& key, int turn) {
+  {
+    lock_guard<mutex> lk(worker_m);
+    _state_buffer[nr] = key;
+    _turns_buffer[nr] = turn;
+    _thread_counter += 1;
+  }
+  worker_cv.notify_all();
+  {
+    unique_lock<mutex> lk(worker_m);
+    worker_cv.wait(lk, []{ return _thread_counter == 0;  })
+  }
+}
+
+inline void MCTSAgent::predict_worker() {
+  while (true) {
+    unique_lock<mutex> lk(worker_m);
+    wait(lk, []{ return _thread_counter == _nr_threads; });
+    call_predict();
+    _thread_counter = 0;
+    lk.unlock();
+    worker_cv.notify_all();
+  }
 }

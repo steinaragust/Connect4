@@ -44,23 +44,29 @@ class MCTSAgent {
   int can_win_now(BoardGame &game);
   void set_NN_predict(bool value);
   int next_batch_simulations();
+  void get_thread_ready_and_wait(int nr, Key &key, int turn);
+  void predict_worker();
 
   // NN methods
-  void call_predict(vector<Key> &states, vector<int> &turns, vector<TreeNodeLabel*> &nodes);
+  void call_predict();
 
   virtual void predict(double**, vector<int**>, vector<int>) = 0;
 
   int _simulation_nr;
   int _nr_moves_so_far;
   GameInfo _info;
+
+  // Thread stuff
   Key* _state_buffer;
-  int _nr_expands;
+  int* _turns_buffer;
+  double **_state_values_buffer;
+  int _nr_threads;
   condition_variable worker_cv;
   mutex worker_m;
   int _thread_counter;
 
-
   private:
+  thread _predict_worker_thread;
   IterationValue *_latest_iteration_value;
   string _name;
   int _simulations;

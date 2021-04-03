@@ -3,9 +3,6 @@
 #include <unordered_map>
 #include <cstdlib>
 #include <ctime>
-#include <thread>
-#include <mutex>
-#include <condition_variable>
 #include "TreeNodeLabel.h"
 #include "BoardGame.h"
 
@@ -83,6 +80,7 @@ class HashMapTree {
   void print_map_size();
 
   private:
+  mutable shared_mutex _mutex;
   Key copy_key(Key key);
   void delete_key(Key key);
   int ROWS;

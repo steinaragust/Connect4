@@ -17,34 +17,27 @@ TreeNodeLabel::~TreeNodeLabel() {
 TreeNodeLabel::TreeNodeLabel(const TreeNodeLabel &copy) {}
 
 int TreeNodeLabel::get_n() {
+  shared_lock lock(_mutex);
   return _n;
 }
 
 double TreeNodeLabel::get_q() {
+  shared_lock lock(_mutex);
   return _q;
 }
 
-void TreeNodeLabel::set_q(double value) {
-  _q = value;
-}
-
 double* TreeNodeLabel::get_p() {
+  shared_lock lock(_mutex);
   return _p;
 }
 
 void TreeNodeLabel::set_p(double* value) {
+  unique_lock lock(_mutex);
   _p = value;
 }
 
-void TreeNodeLabel::set_score(double value) {
-  _score = value;
-}
-
-double TreeNodeLabel::get_score() {
-  return _score;
-}
-
 void TreeNodeLabel::add_visit() {
+  unique_lock lock(_mutex);
   _n += 1;
   _virtual_loss += 1;
   _q = (_score - _virtual_loss) / _n;
@@ -53,12 +46,14 @@ void TreeNodeLabel::add_visit() {
 }
 
 void TreeNodeLabel::backup_value(double value) {
+  unique_lock lock(_mutex);
   _virtual_loss -= 1;
   _score += value;
   _q = (_score - _virtual_loss) / _n;
 }
 
 void TreeNodeLabel::print_p(int size) {
+  shared_lock lock(_mutex);
   printf("Printing p values: \n");
   for (int i = 0; i < size; i++) printf("%lf ", _p[i]);
   printf("\n");

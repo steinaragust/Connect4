@@ -2,6 +2,10 @@ using namespace std;
 
 #include <array>
 #include <vector>
+#include <thread>
+#include <mutex>
+#include <condition_variable>
+#include <shared_mutex>
 #include "math.h"
 #include "BoardGame.h"
 
@@ -18,16 +22,14 @@ class TreeNodeLabel {
   // Functions
   int get_n();
   double get_q();
-  void set_q(double value);
   double* get_p();
   void set_p(double *value);
   void add_visit();
-  void set_score(double value);
-  double get_score();
   void backup_value(double value);
   void print_p(int size);
 
   private:
+  mutable shared_mutex _mutex;
   double _virtual_loss;
   double _score;
   int _n;

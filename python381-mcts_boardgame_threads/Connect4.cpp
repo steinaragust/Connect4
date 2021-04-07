@@ -7,6 +7,12 @@ inline Connect4::Connect4() {
   reset();
 }
 
+inline Connect4::Connect4(const Connect4 &copy) {
+  _turn = copy._turn;
+  _board = copy._board;
+  _no_moves = copy._no_moves;
+}
+
 inline Connect4::~Connect4() {
   for (int i = 0; i < info.ROWS; i++) delete[] _board[i];
   delete[] _board;

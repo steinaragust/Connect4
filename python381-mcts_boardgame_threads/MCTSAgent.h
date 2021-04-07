@@ -28,7 +28,7 @@ struct IterationValue {
 class MCTSAgent {
   public:
   // Constructor/Deconstructor
-  MCTSAgent(GameInfo info, string name, int simulations, int nr_expands);
+  MCTSAgent(GameInfo info, string name, int simulations, int nr_threads);
   virtual ~MCTSAgent();
   MCTSAgent(const MCTSAgent &copy);
 
@@ -42,35 +42,29 @@ class MCTSAgent {
   void print_iteration_value();
   IterationValue* play(BoardGame &game, bool random_move = false);
   int can_win_now(BoardGame &game);
-  void set_NN_predict(bool value);
   int next_batch_simulations();
-  void get_thread_ready_and_wait(int nr, Key &key, int turn);
-  void predict_worker();
 
   // NN methods
   void call_predict();
 
-  virtual void predict(double**, vector<int**>, vector<int>) = 0;
+  virtual void predict_states(double**, vector<int**>, vector<int>) = 0;
 
   int _simulation_nr;
   int _nr_moves_so_far;
   GameInfo _info;
 
   // Thread stuff
-  Key* _state_buffer;
-  int* _turns_buffer;
-  double **_state_values_buffer;
   int _nr_threads;
-  condition_variable worker_cv;
-  mutex worker_m;
-  int _thread_counter;
+  vector<Key> _states_buffer;
+  vector<int> _turns_buffer;
+  void fill_buffer(int thread_nr, BoardGame *game);
 
   private:
   thread _predict_worker_thread;
   IterationValue *_latest_iteration_value;
   string _name;
   int _simulations;
-  HashMapTree _tree;
+  HashMapTree *_tree;
 };
 
 #endif // TREENODE_H

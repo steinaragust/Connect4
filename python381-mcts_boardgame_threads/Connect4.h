@@ -8,6 +8,7 @@ using namespace std;
 class Connect4 : public BoardGame {
   public:
   Connect4();
+  Connect4(const Connect4 &copy);
   ~Connect4();
   void set_copy(BoardGame* copy);
   BoardGame* get_copy();

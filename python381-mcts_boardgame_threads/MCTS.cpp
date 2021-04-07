@@ -29,7 +29,7 @@ inline double game_final_score(BoardGame &game) {
   return 0.5;
 }
 
-Key traverse(BoardGame *game, TreeNodeLabel *parent_node, MCTSAgent &agent, vector<TreeNodeLabel*> &path) {
+void traverse(BoardGame *game, TreeNodeLabel *parent_node, MCTSAgent *agent, vector<TreeNodeLabel*> &path) {
   vector<int> available_moves = game->get_valid_moves();
   vector<TreeNodeLabel*> children_nodes;
   vector<double> children_values;
@@ -40,13 +40,13 @@ Key traverse(BoardGame *game, TreeNodeLabel *parent_node, MCTSAgent &agent, vect
     int m = available_moves[i];
     game->make_move(m);
     Key child_key = game->get_board();
-    HashMapTree *tree = agent.get_tree();
+    HashMapTree *tree = agent->get_tree();
     TreeNodeLabel* child_node = tree->get_node_label(child_key);
     if (child_node == NULL) {
       child_node = tree->add_node(child_key);
       child_node->add_visit();
       path.push_back(child_node);
-      return game->is_terminal_state() ? NULL : child_key;
+      return;
     } else {
       double child_value = PUCT(parent_node, child_node, game->get_prior_index(m));
       if (child_value > best_child_value) {
@@ -63,40 +63,56 @@ Key traverse(BoardGame *game, TreeNodeLabel *parent_node, MCTSAgent &agent, vect
   TreeNodeLabel* chosen = children_nodes[best_index];
   chosen->add_visit();
   path.push_back(chosen);
-  return game->is_terminal_state() ? NULL : traverse(game, chosen, agent, path);
+  if (!game->is_terminal_state()) traverse(game, chosen, agent, path);
 }
 
-void traverse_thread(int nr, BoardGame *game, MCTSAgent &agent) {
+void traverse_thread(int nr, BoardGame *game, MCTSAgent *agent) {
   //Traverse
-  HashMapTree* tree = agent.get_tree();
+  HashMapTree* tree = agent->get_tree();
   vector<TreeNodeLabel*> path;
   TreeNodeLabel* root = tree->get_root();
   root->add_visit();
   path.push_back(root);
-  Key expand_key = traverse(game, root, agent, path);
-  int turn = game->get_to_move();
-  // Evaluate
-  agent.get_thread_ready_and_wait(nr, expand_key, turn);
-  // Backup
-  TreeNodeLabel* node = tree->get_node_label(expand_key);
-  double value = game->is_terminal_state() ? game_final_score(*game) : node->get_p()[agent._info.priors_arr_size];
-  reverse(path.begin(), path.end());
-  for(TreeNodeLabel* node : path) {
-    node->backup_value(value);
-    value = -value;
+  traverse(game, root, agent, path);
+  agent->fill_buffer(nr, game);
+}
+
+void backup_thread(BoardGame *game, HashMapTree *tree) {
+  printf("backup thread");
+  double score;
+  if (!game->is_terminal_state()) {
+    Key key = game->get_board();
+    TreeNodeLabel *node = tree->get_node_label(key);
+    double *values = node->get_p();
+    score = values[game->info.priors_arr_size];
+  } else {
+    score = game_final_score(*game);
   }
-  delete game;
+  while(!game->is_terminal_state()) {
+    Key key = game->get_board();
+    TreeNodeLabel *node = tree->get_node_label(key);
+    node->backup_value(score);
+    score = -score;
+  }
 }
 
 void simulate_threads(BoardGame &game, MCTSAgent &agent) {
   int nr_of_threads = agent.next_batch_simulations();
   vector<thread> threads;
+  vector<BoardGame*> games;
   for (int i = 0; i < nr_of_threads; i++) {
     BoardGame *game_copy = game.get_copy();
-    threads.push_back(thread(traverse_thread, i, game_copy, agent));
+    threads.push_back(thread(traverse_thread, i, game_copy, &agent));
+    games.push_back(game_copy);
   }
-  for (thread &t : threads) {
-    t.join();
+  for (thread &t : threads) t.join();
+  threads.clear();
+  agent.call_predict();
+  HashMapTree *tree = agent.get_tree();
+  for (int i = 0; i < nr_of_threads; i++) {
+    threads.push_back(thread(backup_thread, games[i], tree));
   }
+  for (thread &t : threads) t.join();
+  for (BoardGame *g : games) delete g;
   agent._simulation_nr += nr_of_threads;
 }

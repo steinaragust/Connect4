@@ -20,8 +20,8 @@ class BoardGame {
   public:
   GameInfo info;
   // Virtual functions that need to be implemented
-  virtual BoardGame* get_copy();
-  virtual void set_copy(BoardGame* copy);
+  virtual BoardGame* get_copy() = 0;
+  virtual void set_copy(BoardGame* copy) = 0;
   virtual vector<int> get_valid_moves() = 0;
   virtual void make_move(int move) = 0;
   virtual void retract_move(int move) = 0;

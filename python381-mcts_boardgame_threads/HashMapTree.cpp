@@ -44,16 +44,17 @@ TreeNodeLabel* HashMapTree::get_node_label(Key &key) {
 }
 
 TreeNodeLabel* HashMapTree::add_node(Key &key) {
-  TreeNodeLabel* item = get_node_label(key);
   unique_lock lock(_mutex);
-  if (item == NULL) {
-      TreeNodeLabel* new_label = new TreeNodeLabel();
-      Key new_key = copy_key(key);
-      pair<Key, TreeNodeLabel*> new_pair(new_key, new_label);
-      _node_labels.insert(new_pair);
-      return new_label;
+  unordered_map<Key, TreeNodeLabel*, Hasher, EqualFn>::const_iterator it = _node_labels.find(key);
+  if (it != _node_labels.end()) {
+    TreeNodeLabel* item = it->second;
+    return item;
   }
-  return item;
+  TreeNodeLabel* new_label = new TreeNodeLabel();
+  Key new_key = copy_key(key);
+  pair<Key, TreeNodeLabel*> new_pair(new_key, new_label);
+  _node_labels.insert(new_pair);
+  return new_label;
 }
 
 Key HashMapTree::copy_key(Key key) {

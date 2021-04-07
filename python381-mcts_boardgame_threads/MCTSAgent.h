@@ -60,6 +60,7 @@ class MCTSAgent {
   void fill_buffer(int thread_nr, BoardGame *game);
 
   private:
+  mutex vector_m;
   thread _predict_worker_thread;
   IterationValue *_latest_iteration_value;
   string _name;

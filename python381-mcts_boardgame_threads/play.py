@@ -1,4 +1,5 @@
 import cppyy
+from cppyy import ll
 from utils import load_model
 from mcts_agent import MCTSAgent
 
@@ -22,6 +23,7 @@ def play_game(agent1):
       random_move = moves < nr_random_moves
       obj = agent1.play(game, random_move)
       game.make_move(obj.move)
+      game.print_board()
       moves += 1
   winner = DRAW
   if game.winning_move():

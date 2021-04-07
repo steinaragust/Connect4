@@ -35,6 +35,7 @@ inline void MCTSAgent::set_root(BoardGame &game) {
   _states_buffer.push_back(root_key);
   _turns_buffer.push_back(turn);
   call_predict();
+  root->backup_value(root->get_p()[_info.priors_arr_size]);
 }
 
 inline void MCTSAgent::reset(BoardGame &game) {
@@ -152,24 +153,25 @@ inline int MCTSAgent::next_batch_simulations() {
 }
 
 inline void MCTSAgent::call_predict() {
+  // TODO: Má ekki kalla fyrir duplicatear stöður
   double ** values = new double*[_states_buffer.size()];
   for (int i = 0; i < _states_buffer.size(); i++) {
     values[i] = new double[_info.priors_arr_size + 1];
   }
-  printf("Going to call predict\n");
   predict_states(values, _states_buffer, _turns_buffer);
   for (int i = 0; i < _states_buffer.size(); i++) {
     TreeNodeLabel *node = _tree->get_node_label(_states_buffer[i]);
     node->set_p(values[i]);
   }
-  printf("After predict\n");
 }
 
 inline void MCTSAgent::fill_buffer(int thread_nr, BoardGame* game) {
   if (!game->is_terminal_state()) {
+    vector_m.lock();
     Key state = game->get_board();
     int turn = game->get_to_move();
     _states_buffer.push_back(state);
     _turns_buffer.push_back(turn);
+    vector_m.unlock();
   }
 }

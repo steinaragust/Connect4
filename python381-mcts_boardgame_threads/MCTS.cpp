@@ -7,7 +7,9 @@ const double C = 0.2;
 
 inline double PUCT(TreeNodeLabel* parent, TreeNodeLabel* child, int index) {
   if (child->get_n() == 0) return numeric_limits<double>::max();
-  return child->get_q() + parent->get_p()[index] * C * (sqrt(log(parent->get_n()) / child->get_n()));
+  if (parent->get_p() == NULL) printf("WTF MATE!!!!!");
+  double value = child->get_q() + parent->get_p()[index] * C * (sqrt(log(parent->get_n()) / child->get_n()));
+  return value;
 }
 
 // Choose random child if there are more than one best child
@@ -41,6 +43,8 @@ void traverse(BoardGame *game, TreeNodeLabel *parent_node, MCTSAgent *agent, vec
     game->make_move(m);
     Key child_key = game->get_board();
     HashMapTree *tree = agent->get_tree();
+    // TODO: Gera critical section fall sem athugar hvort nóðan sé til eða ekki
+    // Má ekki velja nóðu sem hefur ekki verið kallað í predict fyrir
     TreeNodeLabel* child_node = tree->get_node_label(child_key);
     if (child_node == NULL) {
       child_node = tree->add_node(child_key);
@@ -66,10 +70,9 @@ void traverse(BoardGame *game, TreeNodeLabel *parent_node, MCTSAgent *agent, vec
   if (!game->is_terminal_state()) traverse(game, chosen, agent, path);
 }
 
-void traverse_thread(int nr, BoardGame *game, MCTSAgent *agent) {
+void traverse_thread(int nr, BoardGame *game, MCTSAgent *agent, vector<TreeNodeLabel*> &path) {
   //Traverse
   HashMapTree* tree = agent->get_tree();
-  vector<TreeNodeLabel*> path;
   TreeNodeLabel* root = tree->get_root();
   root->add_visit();
   path.push_back(root);
@@ -77,42 +80,48 @@ void traverse_thread(int nr, BoardGame *game, MCTSAgent *agent) {
   agent->fill_buffer(nr, game);
 }
 
-void backup_thread(BoardGame *game, HashMapTree *tree) {
-  printf("backup thread");
+void backup_thread(BoardGame *game, HashMapTree *tree, vector<TreeNodeLabel*> &path) {
   double score;
-  if (!game->is_terminal_state()) {
-    Key key = game->get_board();
-    TreeNodeLabel *node = tree->get_node_label(key);
-    double *values = node->get_p();
-    score = values[game->info.priors_arr_size];
+  if (game->is_terminal_state()) {
+    score = game_final_score(*game); 
   } else {
-    score = game_final_score(*game);
+    double *values = path.back()->get_p();
+    score = values[game->info.priors_arr_size];
   }
-  while(!game->is_terminal_state()) {
-    Key key = game->get_board();
-    TreeNodeLabel *node = tree->get_node_label(key);
+  reverse(path.begin(), path.end());
+  for (TreeNodeLabel* node : path) {
     node->backup_value(score);
-    score = -score;
   }
+  delete game;
 }
 
 void simulate_threads(BoardGame &game, MCTSAgent &agent) {
   int nr_of_threads = agent.next_batch_simulations();
   vector<thread> threads;
   vector<BoardGame*> games;
+  vector<vector<TreeNodeLabel*>> paths(nr_of_threads, vector<TreeNodeLabel*>());
+  // printf("Traverse starting \n");
   for (int i = 0; i < nr_of_threads; i++) {
     BoardGame *game_copy = game.get_copy();
-    threads.push_back(thread(traverse_thread, i, game_copy, &agent));
+    threads.push_back(thread(traverse_thread, i, game_copy, &agent, ref(paths[i])));
     games.push_back(game_copy);
   }
-  for (thread &t : threads) t.join();
+  for (thread &t : threads) {
+    t.join();
+  }
+  // printf("Traverse done \n");
   threads.clear();
   agent.call_predict();
   HashMapTree *tree = agent.get_tree();
+  // printf("Backup starting \n");
   for (int i = 0; i < nr_of_threads; i++) {
-    threads.push_back(thread(backup_thread, games[i], tree));
+    threads.push_back(thread(backup_thread, games[i], tree, ref(paths[i])));
   }
-  for (thread &t : threads) t.join();
-  for (BoardGame *g : games) delete g;
+  for (thread &t : threads) {
+    t.join();
+  }
+  printf("virtual loss on root: %d\n", tree->get_root()->get_virtual_loss());
+  // printf("Backup done \n");
   agent._simulation_nr += nr_of_threads;
+  // printf("simulations, so far: %d\n", agent._simulation_nr);
 }

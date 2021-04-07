@@ -6,6 +6,7 @@ using namespace std;
 #include <mutex>
 #include <condition_variable>
 #include <shared_mutex>
+#include <algorithm>
 #include "math.h"
 #include "BoardGame.h"
 
@@ -27,6 +28,7 @@ class TreeNodeLabel {
   void add_visit();
   void backup_value(double value);
   void print_p(int size);
+  int get_virtual_loss();
 
   private:
   mutable shared_mutex _mutex;

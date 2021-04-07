@@ -58,3 +58,7 @@ void TreeNodeLabel::print_p(int size) {
   for (int i = 0; i < size; i++) printf("%lf ", _p[i]);
   printf("\n");
 }
+
+int TreeNodeLabel::get_virtual_loss() {
+  return _virtual_loss;
+}

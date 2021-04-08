@@ -108,6 +108,7 @@ void backup_thread(BoardGame *game, HashMapTree *tree, vector<TreeNodeLabel*> &p
   reverse(path.begin(), path.end());
   for (TreeNodeLabel* node : path) {
     node->backup_value(score);
+    score = -score;
   }
 }
 

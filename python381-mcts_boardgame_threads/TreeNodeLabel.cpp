@@ -41,8 +41,13 @@ void TreeNodeLabel::add_visit() {
   _n += 1;
   _virtual_loss += 1;
   _q = (_score - _virtual_loss) / _n;
-  // _n += 1;
-  // _q += (value - _q) / _n;
+}
+
+void TreeNodeLabel::retract_visit() {
+  unique_lock lock(_mutex);
+  _n -= 1;
+  _virtual_loss -= 1;
+  _q = (_score - _virtual_loss) / _n;
 }
 
 void TreeNodeLabel::backup_value(double value) {
@@ -60,5 +65,6 @@ void TreeNodeLabel::print_p(int size) {
 }
 
 int TreeNodeLabel::get_virtual_loss() {
+  shared_lock lock(_mutex);
   return _virtual_loss;
 }

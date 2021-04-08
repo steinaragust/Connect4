@@ -26,6 +26,7 @@ class TreeNodeLabel {
   double* get_p();
   void set_p(double *value);
   void add_visit();
+  void retract_visit();
   void backup_value(double value);
   void print_p(int size);
   int get_virtual_loss();

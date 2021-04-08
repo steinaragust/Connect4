@@ -74,6 +74,7 @@ class HashMapTree {
   TreeNodeLabel* get_root();
   TreeNodeLabel* get_node_label(Key &key);
   TreeNodeLabel* add_node(Key &key);
+  TreeNodeLabel* add_node_if_not_exists(Key &key);
   bool is_equal(Key &key1, Key &key2);
   size_t hash_code(Key &key);
   void clear_map();

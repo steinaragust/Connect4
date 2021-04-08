@@ -127,6 +127,7 @@ inline IterationValue* MCTSAgent::play(BoardGame &game, bool random_move) {
     simulate_threads(game, *this);
   }
   IterationValue* return_value = get_return_value(game, random_move);
+  print_iteration_value();
   return return_value;
 }
 
@@ -153,7 +154,6 @@ inline int MCTSAgent::next_batch_simulations() {
 }
 
 inline void MCTSAgent::call_predict() {
-  // TODO: Má ekki kalla fyrir duplicatear stöður
   double ** values = new double*[_states_buffer.size()];
   for (int i = 0; i < _states_buffer.size(); i++) {
     values[i] = new double[_info.priors_arr_size + 1];
@@ -166,12 +166,16 @@ inline void MCTSAgent::call_predict() {
 }
 
 inline void MCTSAgent::fill_buffer(int thread_nr, BoardGame* game) {
-  if (!game->is_terminal_state()) {
-    vector_m.lock();
-    Key state = game->get_board();
-    int turn = game->get_to_move();
-    _states_buffer.push_back(state);
-    _turns_buffer.push_back(turn);
-    vector_m.unlock();
-  }
+  vector_m.lock();
+  Key state = game->get_board();
+  // Á ekki að gerast
+  // for (Key _state : _states_buffer) {
+  //   if (_tree->is_equal(state, _state)) {
+  //     return;
+  //   }
+  // }
+  int turn = game->get_to_move();
+  _states_buffer.push_back(state);
+  _turns_buffer.push_back(turn);
+  vector_m.unlock();
 }

@@ -45,7 +45,7 @@ bool traverse(int nr, BoardGame *game, TreeNodeLabel *parent_node, MCTSAgent *ag
     Key child_key = game->get_board();
     HashMapTree *tree = agent->get_tree();
     TreeNodeLabel* child_node = tree->add_node_if_not_exists(child_key);
-    // If node is found
+    // If node is added
     if (child_node != NULL) {
       child_node->add_visit();
       path.push_back(child_node);

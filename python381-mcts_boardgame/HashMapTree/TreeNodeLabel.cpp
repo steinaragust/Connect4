@@ -1,12 +1,11 @@
 #include "TreeNodeLabel.h"
 
-TreeNodeLabel::TreeNodeLabel(bool use_threads) {
+TreeNodeLabel::TreeNodeLabel() {
   _n = 0;
   _q = 0; // Average q gildi, [1, -1, 1, 1, ...] / n
   _p = NULL;
   _virtual_loss = 0;
   _score = 0;
-  _use_threads = use_threads;
 }
 
 TreeNodeLabel::~TreeNodeLabel() {
@@ -21,7 +20,6 @@ TreeNodeLabel::TreeNodeLabel(const TreeNodeLabel &copy) {
   _p = copy._p;
   _virtual_loss = copy._virtual_loss;
   _score = copy._score;
-  _use_threads = copy._use_threads;
 }
 
 int TreeNodeLabel::get_n() {
@@ -32,11 +30,6 @@ int TreeNodeLabel::get_n() {
 double TreeNodeLabel::get_q() {
   shared_lock lock(_mutex);
   return _q;
-}
-
-
-void TreeNodeLabel::set_q(double value) {
-  _q = value;
 }
 
 double* TreeNodeLabel::get_p() {
@@ -50,16 +43,11 @@ void TreeNodeLabel::set_p(double* value) {
 }
 
 
-void TreeNodeLabel::add_visit(double value) {
-  if (_use_threads) {
-    unique_lock lock(_mutex);
-    _n += 1;
-    _virtual_loss += 1;
-    _q = (_score - _virtual_loss) / _n;
-  } else {
-    _n += 1;
-    _q += (value - _q) / _n; 
-  }
+void TreeNodeLabel::add_visit() {
+  unique_lock lock(_mutex);
+  _n += 1;
+  _virtual_loss += 1;
+  _q = (_score - _virtual_loss) / _n;
 }
 
 void TreeNodeLabel::retract_visit() {

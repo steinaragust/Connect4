@@ -168,12 +168,6 @@ inline void MCTSAgent::call_predict() {
 inline void MCTSAgent::fill_buffer(int thread_nr, BoardGame* game) {
   vector_m.lock();
   Key state = game->get_board();
-  // Á ekki að gerast
-  // for (Key _state : _states_buffer) {
-  //   if (_tree->is_equal(state, _state)) {
-  //     return;
-  //   }
-  // }
   int turn = game->get_to_move();
   _states_buffer.push_back(state);
   _turns_buffer.push_back(turn);

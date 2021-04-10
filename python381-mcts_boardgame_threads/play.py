@@ -168,6 +168,7 @@ def play_matches(agent1, agent2, nr_matches = 100):
         else:
           obj = agent2.play(game, random_move)
         game.make_move(obj.move)
+        game.print_board()
         moves += 1
     end_time = time.perf_counter()
     winner = DRAW
@@ -199,7 +200,7 @@ def play_matches(agent1, agent2, nr_matches = 100):
 model1_nr = 8
 model1 = load_model(model1_nr)
 
-model2_nr = 2
+model2_nr = 6
 model2 = load_model(model2_nr)
 
 agent1 = MCTSAgent(game.info, 'AZ_MCTS_Agent_Model-' + str(model1_nr), simulations, model1)

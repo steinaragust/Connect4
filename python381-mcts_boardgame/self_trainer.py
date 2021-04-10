@@ -1,10 +1,9 @@
 import cppyy
 from utils import load_model, latest_generation, encode_for_training, save_dataset, save_model
 from train import train_dataset
-from resnet import ResNet
 from mcts_agent import MCTSAgent
 
-cppyy.include('Connect4.cpp')
+cppyy.include('./BoardGame/C4/Connect4.cpp')
 
 nr_random_moves = 6
 simulations = 300

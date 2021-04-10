@@ -3,15 +3,15 @@ import torch
 import torch.tensor as tensor
 import numpy as np
 
-cppyy.include('./BoardGame.h')
-cppyy.include('./TreeNodeLabel.cpp')
-cppyy.include('./HashMapTree.cpp')
-cppyy.include('./MCTSAgent.cpp')
+cppyy.include('./BoardGame/BoardGame.h')
+cppyy.include('./HashMapTree/TreeNodeLabel.cpp')
+cppyy.include('./HashMapTree/HashMapTree.cpp')
+cppyy.include('./MCTSAgent/MCTSAgent.cpp')
 
 class MCTSAgent(cppyy.gbl.MCTSAgent):
-  def __init__(self, game_info, name = 'MCTSAgent', iterations = 200, model = None):
+  def __init__(self, game_info, name = 'MCTSAgent', simulations = 200, max_time_seconds = 0, nr_threads = 1, model = None):
     self.model = model
-    super().__init__(game_info, name, iterations, False if model == None else True)
+    super().__init__(game_info, name, simulations, max_time_seconds, nr_threads, False if model == None else True)
 
   def get_model(self):
     return self.model
@@ -20,7 +20,7 @@ class MCTSAgent(cppyy.gbl.MCTSAgent):
     self.model = model
     self.set_NN_predict(True)
 
-  def predict(self, values, states, turns):
+  def predict_states(self, values, states, turns):
     states_list = list(states)
     turns_list = list(turns)
     encoded_states = self.encode(states_list, turns_list)

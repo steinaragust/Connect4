@@ -7,15 +7,15 @@ inline Connect4::Connect4() {
   reset();
 }
 
-inline Connect4::~Connect4() {
-  for (int i = 0; i < info.ROWS; i++) delete[] _board[i];
-  delete[] _board;
-}
-
 inline Connect4::Connect4(const Connect4 &copy) {
   _turn = copy._turn;
   _board = copy._board;
   _no_moves = copy._no_moves;
+}
+
+inline Connect4::~Connect4() {
+  for (int i = 0; i < info.ROWS; i++) delete[] _board[i];
+  delete[] _board;
 }
 
 inline vector<int> Connect4::get_valid_moves() {
@@ -178,4 +178,21 @@ inline void Connect4::print_board() {
   }
   printf("%s", string(info.COLUMNS + 2, '-').c_str());
   printf("\n");
+}
+
+inline BoardGame* Connect4::get_copy() {
+  BoardGame *_copy = new Connect4();
+  _copy->set_copy(this);
+  return _copy;
+}
+
+inline void Connect4::set_copy(BoardGame* copy) {
+  _turn = copy->get_to_move();
+  _no_moves = copy->get_move_no();
+  Key copy_key = copy->get_board();
+  for (int i = 0; i < info.ROWS; i++) {
+    for (int j = 0; j < info.COLUMNS; j++) {
+      _board[i][j] = copy_key[i][j];
+    }
+  }
 }

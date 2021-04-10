@@ -1,6 +1,6 @@
 using namespace std;
 
-#include "BoardGame.h"
+#include "../BoardGame.h"
 
 #ifndef CONNECT4_H
 #define CONNECT4_H
@@ -10,6 +10,8 @@ class Connect4 : public BoardGame {
   Connect4();
   Connect4(const Connect4 &copy);
   ~Connect4();
+  void set_copy(BoardGame* copy);
+  BoardGame* get_copy();
   vector<int> get_valid_moves();
   void make_move(int move);
   void retract_move(int move);

@@ -4,7 +4,6 @@
 #include <cstdlib>
 #include <ctime>
 #include "TreeNodeLabel.h"
-#include "BoardGame.h"
 
 using namespace std;
 
@@ -73,13 +72,17 @@ class HashMapTree {
   TreeNodeLabel* set_root(Key &root_key);
   TreeNodeLabel* get_root();
   TreeNodeLabel* get_node_label(Key &key);
+  // Not thread safe
   TreeNodeLabel* add_node(Key &key);
+  // Thread safe function that returns NULL if node exists
+  TreeNodeLabel* add_node_if_not_exists(Key &key);
   bool is_equal(Key &key1, Key &key2);
   size_t hash_code(Key &key);
   void clear_map();
   void print_map_size();
 
   private:
+  mutable shared_mutex _mutex;
   Key copy_key(Key key);
   void delete_key(Key key);
   int ROWS;

@@ -7,8 +7,10 @@ using namespace std;
 #ifndef BOARDGAME_H
 #define BOARDGAME_H
 
+// Key for HashMap is a matrix
 typedef int** Key;
 
+// Game information needed for abstract class implementation
 struct GameInfo {
   int ROWS;
   int COLUMNS;
@@ -20,6 +22,8 @@ class BoardGame {
   public:
   GameInfo info;
   // Virtual functions that need to be implemented
+  virtual BoardGame* get_copy() = 0;
+  virtual void set_copy(BoardGame* copy) = 0;
   virtual vector<int> get_valid_moves() = 0;
   virtual void make_move(int move) = 0;
   virtual void retract_move(int move) = 0;

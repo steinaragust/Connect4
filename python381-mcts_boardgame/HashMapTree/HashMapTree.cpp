@@ -33,6 +33,7 @@ TreeNodeLabel* HashMapTree::set_root(Key &root_key) {
 }
 
 TreeNodeLabel* HashMapTree::get_node_label(Key &key) {
+  shared_lock lock(_mutex);
   unordered_map<Key, TreeNodeLabel*, Hasher, EqualFn>::const_iterator it = _node_labels.find(key);
   if (it != _node_labels.end()) {
     TreeNodeLabel* item = it->second;
@@ -52,6 +53,20 @@ TreeNodeLabel* HashMapTree::add_node(Key &key) {
       return new_label;
   }
   return item;
+}
+
+TreeNodeLabel* HashMapTree::add_node_if_not_exists(Key &key) {
+  unique_lock lock(_mutex);
+  unordered_map<Key, TreeNodeLabel*, Hasher, EqualFn>::const_iterator it = _node_labels.find(key);
+  if (it != _node_labels.end()) {
+    TreeNodeLabel* item = it->second;
+    return NULL;
+  }
+  TreeNodeLabel* new_label = new TreeNodeLabel();
+  Key new_key = copy_key(key);
+  pair<Key, TreeNodeLabel*> new_pair(new_key, new_label);
+  _node_labels.insert(new_pair);
+  return new_label;
 }
 
 Key HashMapTree::copy_key(Key key) {

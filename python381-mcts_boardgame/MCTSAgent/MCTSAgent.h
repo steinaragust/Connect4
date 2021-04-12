@@ -46,6 +46,7 @@ class MCTSAgent {
   IterationValue* play(BoardGame &game, bool random_move = false);
   int can_win_now(BoardGame &game);
   int next_batch_simulations();
+  void set_max_time_seconds(double max_time_seconds);
 
   // NN methods
   void call_predict();

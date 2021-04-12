@@ -195,3 +195,7 @@ inline void MCTSAgent::fill_buffer(int thread_nr, BoardGame* game) {
 inline void MCTSAgent::set_NN_predict(bool value) {
   _use_NN_predict = value;
 }
+
+inline void MCTSAgent::set_max_time_seconds(double max_time_seconds) {
+  _max_time_seconds = max_time_seconds;
+}

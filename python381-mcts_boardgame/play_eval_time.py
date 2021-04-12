@@ -14,7 +14,6 @@ model_nr = 8
 nr_threads1 = 10
 nr_threads2 = 1
 
-print_summary = False
 write_stats = True
 
 PLAYER_1 = 'Player_1'
@@ -35,14 +34,16 @@ def play_matches(agent1, agent2, nr_matches = 100):
     agent2.get_name(): { WIN: {PLAYER_1: [], PLAYER_2: [] }, LOSE: {PLAYER_1: [], PLAYER_2: [] } },
   }
   number_of_simulations = {
-    agent1.get_name(): [],
-    agent2.get_name(): [],
+    agent1.get_name(): { 'Move': [], 'Game': [] },
+    agent2.get_name(): { 'Move': [], 'Game': [] },
   }
 
-  def record_result(player_1, player_2, result, moves, simulations_p1, simulations_p2):
+  def record_result(player_1, player_2, result, moves, simulations_p1, simulations_p2, simulations_p1_avg, simulations_p2_avg):
     nonlocal scores, number_of_moves, number_of_simulations
-    number_of_simulations[player_1].append(simulations_p1)
-    number_of_simulations[player_2].append(simulations_p2)
+    number_of_simulations[player_1]['Game'].append(simulations_p1)
+    number_of_simulations[player_2]['Game'].append(simulations_p2)
+    number_of_simulations[player_1]['Move'].append(simulations_p1_avg)
+    number_of_simulations[player_2]['Move'].append(simulations_p2_avg)
     if result == DRAW:
       scores[player_1][DRAW][PLAYER_1] += 1
       scores[player_2][DRAW][PLAYER_2] += 1
@@ -127,35 +128,42 @@ def play_matches(agent1, agent2, nr_matches = 100):
     f.write('Standard deviation of moves for lost games playing as P1/P2: %f/%f\n\n' % (std_p1_lose_move, std_p2_lose_move))
 
     #Simulations
-    avg_simulations = statistics.fmean(number_of_simulations[agent_name])
-    std_simulations = statistics.stdev(number_of_simulations[agent_name])
+    avg_simulations_game = statistics.fmean(number_of_simulations[agent_name]['Game'])
+    std_simulations_game = statistics.stdev(number_of_simulations[agent_name]['Game'])
 
-    f.write('Average nr simulations per game: %f\n' % (avg_simulations))
-    f.write('Standard deviation for nr simulations per game: %f\n\n' % (std_simulations))
+    avg_simulations_move = statistics.fmean(number_of_simulations[agent_name]['Move'])
+    std_simulations_move = statistics.stdev(number_of_simulations[agent_name]['Move'])
+
+    f.write('Average nr simulations per game: %f\n' % (avg_simulations_game))
+    f.write('Standard deviation for nr simulations per game: %f\n\n' % (std_simulations_game))
+    
+    f.write('Average nr simulations per move: %f\n' % (avg_simulations_move))
+    f.write('Standard deviation for nr simulations per move: %f\n\n' % (std_simulations_move))
 
     f.write('Ending summary\n\n')
 
 
   def play_game(agent1, agent2):
     game.reset()
-    moves = 0
+    moves_p1 = 0
+    moves_p2 = 0
     simulations_a1 = 0
     simulations_a2 = 0
     while(not game.is_terminal_state()):
-        random_move = moves < nr_random_moves
+        random_move = (moves_p1 + moves_p2) < nr_random_moves
         if game.get_to_move() == 0:
           obj = agent1.play(game, random_move)
           simulations_a1 += obj.simulations
+          moves_p1 += 1
         else:
           obj = agent2.play(game, random_move)
           simulations_a2 += obj.simulations
+          moves_p2 += 1
         game.make_move(obj.move)
-        game.print_board()
-        moves += 1
     winner = DRAW
     if game.winning_move():
         winner = PLAYER_1 if game.get_to_move_opponent() == 0 else PLAYER_2
-    return winner, moves, simulations_a1, simulations_a2
+    return winner, moves_p1 + moves_p2, simulations_a1, simulations_a2, simulations_a1 / moves_p1, simulations_a2 / moves_p2
 
   agent1_name = agent1.get_name()
   agent2_name = agent2.get_name()
@@ -163,10 +171,14 @@ def play_matches(agent1, agent2, nr_matches = 100):
   for i in range(nr_matches):
     if (i + 1) % 10 == 0:
       print('Starting match nr: %d\n' % (i))
-    result, moves, simulations_a1, simulations_a2 = play_game(agent1, agent2)
-    record_result(agent1_name, agent2_name, result, moves, simulations_a1, simulations_a2)
-    result, moves, simulations_a1, simulations_a2 = play_game(agent2, agent1)
-    record_result(agent2_name, agent1_name, result, moves, simulations_a1, simulations_a2)
+      agent1_wins = scores[agent1_name][WIN][PLAYER_1] + scores[agent1_name][WIN][PLAYER_2]
+      agent2_wins = scores[agent2_name][WIN][PLAYER_1] + scores[agent2_name][WIN][PLAYER_2]
+      draws = scores[agent1_name][DRAW][PLAYER_1] + scores[agent1_name][DRAW][PLAYER_2]
+      print('Score so far, %s: %d, %s: %d, %s: %d\n' % (agent1_name, agent1_wins, agent2_name, agent2_wins, DRAW, draws))
+    result, moves, simulations_a1, simulations_a2, simulations_a1m, simulations_a2m = play_game(agent1, agent2)
+    record_result(agent1_name, agent2_name, result, moves, simulations_a1, simulations_a2, simulations_a1m, simulations_a2m)
+    result, moves, simulations_a1, simulations_a2, simulations_a1m, simulations_a2m = play_game(agent2, agent1)
+    record_result(agent2_name, agent1_name, result, moves, simulations_a1, simulations_a2, simulations_a1m, simulations_a2m)
 
   result_file = results_path + '/' + str(agent1_name) + '_vs_' + str(agent2_name) + '.txt'
   agent1_wins = scores[agent1_name][WIN][PLAYER_1] + scores[agent1_name][WIN][PLAYER_2]
@@ -178,12 +190,26 @@ def play_matches(agent1, agent2, nr_matches = 100):
       f.write(summary)
       print_agent_summary(agent1_name, f)
       print_agent_summary(agent2_name, f)
-  if print_summary:
-    print(summary)
 
 model = load_model(model_nr)
 
-agent1 = MCTSAgent(game.info, 'AZ_MCTS_Agent_threads-' + str(nr_threads1), simulations, seconds, nr_threads1, model)
-agent2 = MCTSAgent(game.info, 'AZ_MCTS_Agent_threads-' + str(nr_threads2), simulations, seconds, nr_threads2, model)
+agent1 = MCTSAgent(game.info, 'AZ_MCTS_Agent_threads-' + str(nr_threads1) + '_sec-' + str(seconds), simulations, seconds, nr_threads1, model)
+agent2 = MCTSAgent(game.info, 'AZ_MCTS_Agent_threads-' + str(nr_threads2) + '_sec-' + str(seconds), simulations, seconds, nr_threads2, model)
 
-play_matches(agent1, agent2, 1)
+play_matches(agent1, agent2)
+
+seconds = 3
+
+agent1.set_max_time_seconds(seconds)
+agent1.set_name('AZ_MCTS_Agent_threads-' + str(nr_threads1) + '_sec-' + str(seconds))
+agent2.set_max_time_seconds(seconds)
+agent2.set_name('AZ_MCTS_Agent_threads-' + str(nr_threads2) + '_sec-' + str(seconds))
+play_matches(agent1, agent2)
+
+seconds = 1
+
+agent1.set_max_time_seconds(seconds)
+agent1.set_name('AZ_MCTS_Agent_threads-' + str(nr_threads1) + '_sec-' + str(seconds))
+agent2.set_max_time_seconds(seconds)
+agent2.set_name('AZ_MCTS_Agent_threads-' + str(nr_threads2) + '_sec-' + str(seconds))
+play_matches(agent1, agent2)

@@ -153,7 +153,7 @@ void simulate_threads(BoardGame &game, MCTSAgent &agent) {
     t.join();
   }
   threads.clear();
-  if (agent._use_NN_predict) {
+  if (agent._use_NN_predict && agent._states_buffer.size() > 0) {
     agent.call_predict();
   }
   HashMapTree *tree = agent.get_tree();

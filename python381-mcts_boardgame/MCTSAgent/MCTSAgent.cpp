@@ -145,7 +145,6 @@ inline IterationValue* MCTSAgent::play(BoardGame &game, bool random_move) {
   _latest_iteration_value->time_elapsed = timer.elapsedSeconds();
   timer.stop();
   IterationValue* return_value = get_return_value(game, random_move);
-  print_iteration_value();
   return return_value;
 }
 

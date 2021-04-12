@@ -10,6 +10,7 @@ using namespace std;
 struct IterationValue {
   int move;
   int simulations;
+  int states_predicted;
   double time_elapsed;
   double q_value;
   double *q_values;
@@ -70,6 +71,7 @@ class MCTSAgent {
   thread _predict_worker_thread;
   IterationValue *_latest_iteration_value;
   string _name;
+  int _states_predicted;
   int _simulations;
   double _max_time_seconds;
   HashMapTree *_tree;

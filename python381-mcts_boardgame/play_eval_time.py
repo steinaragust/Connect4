@@ -37,13 +37,19 @@ def play_matches(agent1, agent2, nr_matches = 100):
     agent1.get_name(): { 'Move': [], 'Game': [] },
     agent2.get_name(): { 'Move': [], 'Game': [] },
   }
+  states_predicted = {
+    agent1.get_name(): [],
+    agent2.get_name(): []
+  }
 
-  def record_result(player_1, player_2, result, moves, simulations_p1, simulations_p2, simulations_p1_avg, simulations_p2_avg):
+  def record_result(player_1, player_2, result, moves, simulations_p1, simulations_p2, simulations_p1_avg, simulations_p2_avg, expands_p1, expands_p2):
     nonlocal scores, number_of_moves, number_of_simulations
     number_of_simulations[player_1]['Game'].append(simulations_p1)
     number_of_simulations[player_2]['Game'].append(simulations_p2)
     number_of_simulations[player_1]['Move'].append(simulations_p1_avg)
     number_of_simulations[player_2]['Move'].append(simulations_p2_avg)
+    states_predicted[player_1].append(expands_p1)
+    states_predicted[player_2].append(expands_p2)
     if result == DRAW:
       scores[player_1][DRAW][PLAYER_1] += 1
       scores[player_2][DRAW][PLAYER_2] += 1
@@ -140,6 +146,13 @@ def play_matches(agent1, agent2, nr_matches = 100):
     f.write('Average nr simulations per move: %f\n' % (avg_simulations_move))
     f.write('Standard deviation for nr simulations per move: %f\n\n' % (std_simulations_move))
 
+    #Expands
+    avg_expands_game = statistics.fmean(states_predicted[agent_name])
+    std_expands_game = statistics.stdev(states_predicted[agent_name])
+
+    f.write('Average nr expands per move: %f\n' % (avg_expands_game))
+    f.write('Standard deviation for nr expands per move: %f\n\n' % (std_expands_game))
+
     f.write('Ending summary\n\n')
 
 
@@ -149,21 +162,25 @@ def play_matches(agent1, agent2, nr_matches = 100):
     moves_p2 = 0
     simulations_a1 = 0
     simulations_a2 = 0
+    expands_a1 = 0
+    expands_a2 = 0
     while(not game.is_terminal_state()):
         random_move = (moves_p1 + moves_p2) < nr_random_moves
         if game.get_to_move() == 0:
           obj = agent1.play(game, random_move)
           simulations_a1 += obj.simulations
+          expands_a1 += obj.states_predicted
           moves_p1 += 1
         else:
           obj = agent2.play(game, random_move)
           simulations_a2 += obj.simulations
+          expands_a2 += obj.states_predicted
           moves_p2 += 1
         game.make_move(obj.move)
     winner = DRAW
     if game.winning_move():
         winner = PLAYER_1 if game.get_to_move_opponent() == 0 else PLAYER_2
-    return winner, moves_p1 + moves_p2, simulations_a1, simulations_a2, simulations_a1 / moves_p1, simulations_a2 / moves_p2
+    return winner, moves_p1 + moves_p2, simulations_a1, simulations_a2, simulations_a1 / moves_p1, simulations_a2 / moves_p2, expands_a1 / moves_p1, expands_a2 / moves_p2
 
   agent1_name = agent1.get_name()
   agent2_name = agent2.get_name()
@@ -175,10 +192,10 @@ def play_matches(agent1, agent2, nr_matches = 100):
       agent2_wins = scores[agent2_name][WIN][PLAYER_1] + scores[agent2_name][WIN][PLAYER_2]
       draws = scores[agent1_name][DRAW][PLAYER_1] + scores[agent1_name][DRAW][PLAYER_2]
       print('Score so far, %s: %d, %s: %d, %s: %d\n' % (agent1_name, agent1_wins, agent2_name, agent2_wins, DRAW, draws))
-    result, moves, simulations_a1, simulations_a2, simulations_a1m, simulations_a2m = play_game(agent1, agent2)
-    record_result(agent1_name, agent2_name, result, moves, simulations_a1, simulations_a2, simulations_a1m, simulations_a2m)
-    result, moves, simulations_a1, simulations_a2, simulations_a1m, simulations_a2m = play_game(agent2, agent1)
-    record_result(agent2_name, agent1_name, result, moves, simulations_a1, simulations_a2, simulations_a1m, simulations_a2m)
+    result, moves, simulations_a1, simulations_a2, simulations_a1m, simulations_a2m, expandsa1, expandsa2 = play_game(agent1, agent2)
+    record_result(agent1_name, agent2_name, result, moves, simulations_a1, simulations_a2, simulations_a1m, simulations_a2m, expandsa1, expandsa2)
+    result, moves, simulations_a1, simulations_a2, simulations_a1m, simulations_a2m, expandsa1, expandsa2 = play_game(agent2, agent1)
+    record_result(agent2_name, agent1_name, result, moves, simulations_a1, simulations_a2, simulations_a1m, simulations_a2m, expandsa1, expandsa2)
 
   result_file = results_path + '/' + str(agent1_name) + '_vs_' + str(agent2_name) + '.txt'
   agent1_wins = scores[agent1_name][WIN][PLAYER_1] + scores[agent1_name][WIN][PLAYER_2]

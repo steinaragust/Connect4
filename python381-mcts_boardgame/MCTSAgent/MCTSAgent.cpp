@@ -45,6 +45,7 @@ inline void MCTSAgent::set_root(BoardGame &game) {
 
 inline void MCTSAgent::reset(BoardGame &game) {
   _simulation_nr = 0;
+  _states_predicted = 0;
   next_batch_simulations();
   _tree->clear_map();
   set_root(game);
@@ -58,6 +59,7 @@ inline IterationValue* MCTSAgent::get_return_value(BoardGame &game, bool random_
   TreeNodeLabel* root = _tree->get_root();
   _latest_iteration_value->q_value = _tree->get_root()->get_q();
   _latest_iteration_value->simulations = _simulation_nr;
+  _latest_iteration_value->states_predicted = _states_predicted;
   for (int i = 0; i < _info.priors_arr_size; i++) {
     _latest_iteration_value->q_values[i] = numeric_limits<double>::lowest();
     _latest_iteration_value->n_values[i] = numeric_limits<int>::min();
@@ -171,6 +173,7 @@ inline int MCTSAgent::next_batch_simulations() {
 }
 
 inline void MCTSAgent::call_predict() {
+  _states_predicted += _states_buffer.size();
   double ** values = new double*[_states_buffer.size()];
   for (int i = 0; i < _states_buffer.size(); i++) {
     values[i] = new double[_info.priors_arr_size + 1];

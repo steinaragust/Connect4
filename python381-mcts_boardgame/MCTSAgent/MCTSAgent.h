@@ -52,13 +52,12 @@ class MCTSAgent {
   // NN methods
   void call_predict();
   virtual void predict_states(double**, vector<int**>, vector<int>) = 0;
+  void set_NN_predict(bool value);
+  bool _use_NN_predict;
 
   int _simulation_nr;
   int _nr_moves_so_far;
   GameInfo _info;
-
-  void set_NN_predict(bool value);
-  bool _use_NN_predict;
 
   // Thread stuff
   int _nr_threads;

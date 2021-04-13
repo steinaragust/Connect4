@@ -9,9 +9,9 @@ results_path = 'data/eval_results'
 
 nr_random_moves = 4
 simulations = 0
-seconds = 5
+seconds = 3
 model_nr = 8
-nr_threads1 = 10
+nr_threads1 = 3
 nr_threads2 = 1
 
 write_stats = True
@@ -209,18 +209,11 @@ def play_matches(agent1, agent2, nr_matches = 100):
       print_agent_summary(agent2_name, f)
 
 model = load_model(model_nr)
+print("agent 1 has: %d threads, agent 2 has: %d threads\n" % (nr_threads1, nr_threads2))
 
 agent1 = MCTSAgent(game.info, 'AZ_MCTS_Agent_threads-' + str(nr_threads1) + '_sec-' + str(seconds), simulations, seconds, nr_threads1, model)
 agent2 = MCTSAgent(game.info, 'AZ_MCTS_Agent_threads-' + str(nr_threads2) + '_sec-' + str(seconds), simulations, seconds, nr_threads2, model)
 
-play_matches(agent1, agent2)
-
-seconds = 3
-
-agent1.set_max_time_seconds(seconds)
-agent1.set_name('AZ_MCTS_Agent_threads-' + str(nr_threads1) + '_sec-' + str(seconds))
-agent2.set_max_time_seconds(seconds)
-agent2.set_name('AZ_MCTS_Agent_threads-' + str(nr_threads2) + '_sec-' + str(seconds))
 play_matches(agent1, agent2)
 
 seconds = 1
@@ -230,3 +223,4 @@ agent1.set_name('AZ_MCTS_Agent_threads-' + str(nr_threads1) + '_sec-' + str(seco
 agent2.set_max_time_seconds(seconds)
 agent2.set_name('AZ_MCTS_Agent_threads-' + str(nr_threads2) + '_sec-' + str(seconds))
 play_matches(agent1, agent2)
+

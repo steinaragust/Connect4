@@ -1,0 +1,70 @@
+AZ_MCTS_Agent_threads-5_sec-1 wins a total of: 123 games, AZ_MCTS_Agent_threads-1_sec-1 wins a total of: 32 games, draws: 45
+
+Starting summary for agent: AZ_MCTS_Agent_threads-5_sec-1
+
+Total score: 145.500000, total score ratio: 0.727500
+
+Win ratios(excluding draws):
+Win ratio: 0.615000
+Win ratio: P1/P2: 0.552846/0.447154
+
+Loss ratios(excluding draws):
+Loss ratio: 0.160000
+Loss ratio: P1/P2: 0.343750/0.656250
+
+Draw ratio: P1/P2: 0.466667/0.533333
+
+Average number of moves for won/lost games: 27.495935/28.343750
+Standard deviation for number of moves for won/lost games: 10.717210/13.656168
+
+Average number of moves for won games playing as P1/P2: 23.441176/32.509091
+Standard deviation of moves for won games playing as P1/P2: 11.516869/6.973157
+
+Average number of moves for lost games playing as P1/P2: 35.818182/24.428571
+Standard deviation of moves for lost games playing as P1/P2: 6.096199/14.955171
+
+Average nr simulations per game: 91340.095000
+Standard deviation for nr simulations per game: 48438.065696
+
+Average nr simulations per move: 5923.246047
+Standard deviation for nr simulations per move: 2093.770119
+
+Average nr expands per move: 242.548864
+Standard deviation for nr expands per move: 25.543666
+
+Ending summary
+
+Starting summary for agent: AZ_MCTS_Agent_threads-1_sec-1
+
+Total score: 54.500000, total score ratio: 0.272500
+
+Win ratios(excluding draws):
+Win ratio: 0.160000
+Win ratio: P1/P2: 0.656250/0.343750
+
+Loss ratios(excluding draws):
+Loss ratio: 0.615000
+Loss ratio: P1/P2: 0.447154/0.552846
+
+Draw ratio: P1/P2: 0.533333/0.466667
+
+Average number of moves for won/lost games: 28.343750/27.495935
+Standard deviation for number of moves for won/lost games: 13.656168/10.717210
+
+Average number of moves for won games playing as P1/P2: 24.428571/35.818182
+Standard deviation of moves for won games playing as P1/P2: 14.955171/6.096199
+
+Average number of moves for lost games playing as P1/P2: 32.509091/23.441176
+Standard deviation of moves for lost games playing as P1/P2: 6.973157/11.516869
+
+Average nr simulations per game: 44816.700000
+Standard deviation for nr simulations per game: 37605.033639
+
+Average nr simulations per move: 2672.537583
+Standard deviation for nr simulations per move: 1934.174053
+
+Average nr expands per move: 52.801054
+Standard deviation for nr expands per move: 4.417522
+
+Ending summary
+

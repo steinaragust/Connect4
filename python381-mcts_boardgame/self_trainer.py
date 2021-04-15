@@ -8,7 +8,7 @@ cppyy.include('./BoardGame/C4/Connect4.cpp')
 nr_random_moves = 6
 simulations = 300
 
-def train_generations(nr_generations, nr_matches = 200):
+def train_generations(nr_generations, nr_games = 200):
   game = cppyy.gbl.Connect4.Connect4()
   generation = latest_generation()
   agent = MCTSAgent(game.info, 'MCTSAgent', simulations)
@@ -63,7 +63,7 @@ def train_generations(nr_generations, nr_matches = 200):
   for _ in range(nr_generations):
     next_generation()
     print('Generation %d starting' % (generation))
-    play_games(nr_matches)
+    play_games(nr_games)
     data = encode_for_training(states, turns, policies, values)
     model = agent.get_model()
     train_dataset(data, model, generation)

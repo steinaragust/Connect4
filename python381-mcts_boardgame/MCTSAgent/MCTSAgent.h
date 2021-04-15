@@ -36,7 +36,7 @@ class MCTSAgent {
   virtual ~MCTSAgent();
   MCTSAgent(const MCTSAgent &copy);
 
-  // Public methods
+  // Methods
   void set_name(string name);
   string get_name();
   HashMapTree* get_tree();
@@ -48,26 +48,22 @@ class MCTSAgent {
   int can_win_now(BoardGame &game);
   int next_batch_simulations();
   void set_max_time_seconds(double max_time_seconds);
-
-  // NN methods
   void call_predict();
   virtual void predict_states(double**, vector<int**>, vector<int>) = 0;
   void set_NN_predict(bool value);
-  bool _use_NN_predict;
+  void fill_buffer(int thread_nr, BoardGame *game);
 
+  // Variables
+  bool _use_NN_predict;
   int _simulation_nr;
   int _nr_moves_so_far;
   GameInfo _info;
-
-  // Thread stuff
   int _nr_threads;
   vector<Key> _states_buffer;
   vector<int> _turns_buffer;
-  void fill_buffer(int thread_nr, BoardGame *game);
 
   private:
   mutex vector_m;
-  thread _predict_worker_thread;
   IterationValue *_latest_iteration_value;
   string _name;
   int _states_predicted;

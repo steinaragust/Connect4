@@ -14,7 +14,6 @@ inline MCTSAgent::MCTSAgent(GameInfo info, string name, int simulations, double 
 
 inline MCTSAgent::~MCTSAgent() {
   _tree->clear_map();
-  // delete _tree;
   _latest_iteration_value->~IterationValue();
 }
 
